@@ -1,135 +1,26 @@
 <?php
 namespace Library;
-use Phalcon\Db\Column;
-use Phalcon\Logger\Exception;
-use Phalcon\Logger\Formatter\Line as LineFormatter;
-use Phalcon\Logger\Adapter as LoggerAdapter;
-use Phalcon\Logger\AdapterInterface;
-use Phalcon\Db\AdapterInterface as DbAdapterInterface;
-/**
- * Database Logger
- *
- * Adapter to store logs in a database table
- *
- * @package Phalcon\Logger\Adapter
- */
-class Logger extends LoggerAdapter implements AdapterInterface
-{
 
+use Phalcon\Logger\Formatter\Line;
+use Phalcon\Logger\Adapter\File;
+class Logger extends File
+{
 	/**
-	 * Adapter options
-	 * @var array
-	 */
-	protected $options = [];
-	/**
-	 * @var \Phalcon\Db\AdapterInterface
-	 */
-	protected $db;
-	/**
-	 * Class constructor.
-	 *
-	 * @param  string $name
-	 * @param  array  $options
-	 * @throws \Phalcon\Logger\Exception
-	 */
-	public function __construct(array $options = [])
+	* Cache constructor.
+	* @param $config
+	*/
+	public function __construct($config)
 	{
-		if (!isset($options['db'])) {
-			throw new Exception("Parameter 'db' is required");
-		}
-		if (!$options['db'] instanceof DbAdapterInterface) {
-			throw new Exception("Parameter 'db' must be object and implement AdapterInterface");
-		}
-		if (!isset($options['table'])) {
-			throw new Exception("Parameter 'table' is required");
-		}
-		$this->db = $options['db'];
-		$this->options = $options;
-	}
-	/**
-	 * Sets database connection
-	 *
-	 * @param AdapterInterface $db
-	 * @return $this
-	 */
-	public function setDb(AdapterInterface $db)
-	{
-		$this->db = $db;
-		return $this;
-	}
-	/**
-	 * {@inheritdoc}
-	 *
-	 * @return \Phalcon\Logger\FormatterInterface
-	 */
-	public function getFormatter()
-	{
-		if (!is_object($this->_formatter)) {
-			$this->_formatter = new LineFormatter('%message%');
-		}
-		return $this->_formatter;
-	}
-	/**
-	 * Writes the log to the file itself
-	 *
-	 * @param string  $message
-	 * @param integer $type
-	 * @param integer $time
-	 * @param array   $context
-	 * @return bool
-	 */
-	public function logInternal($message, $type, $time, $context = [])
-	{
-		print_r($message);
-		exit();
-		return $this->db->execute(
-			'INSERT INTO ' . $this->options['table'] . ' VALUES (null, null, ?, ?, ?)',
-			[$type, $this->getFormatter()->format($message, $type, $time, $context), $time],
-			[Column::BIND_PARAM_INT, Column::BIND_PARAM_STR, Column::BIND_PARAM_INT]
+		$fileName = $config->get('defaultFilename', 'application');
+		$format = $config->get('format', '[%date%][%type%] %message%');
+		$logFile   = sprintf(
+				'%s/logs/%s-%s.log',
+				APP_PATH,
+				date('Ymd'),
+				$fileName
 		);
-	}
-	/**
-	 * {@inheritdoc}
-	 *
-	 * @return boolean
-	 */
-	public function close()
-	{
-		if ($this->db->isUnderTransaction()) {
-			$this->db->commit();
-		}
-		$this->db->close();
-		return true;
-	}
-	/**
-	 * {@inheritdoc}
-	 *
-	 * @return $this
-	 */
-	public function begin()
-	{
-		$this->db->begin();
-		return $this;
-	}
-	/**
-	 * Commit transaction
-	 *
-	 * @return $this
-	 */
-	public function commit()
-	{
-		$this->db->commit();
-		return $this;
-	}
-	/**
-	 * Rollback transaction
-	 * (happens automatically if commit never reached)
-	 *
-	 * @return $this
-	 */
-	public function rollback()
-	{
-		$this->db->rollback();
-		return $this;
+		$logger    = new File($logFile);
+		$logger->setFormatter(new Line($format));
+		return $logger;
 	}
 }

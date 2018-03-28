@@ -23,7 +23,7 @@ use Phalcon\Mvc\Model\Manager as ModelsManager;
 use Phalcon\Mvc\Model\MetaData\Redis as MetaData;
 use Phalcon\Cache\Frontend\Data;
 use Phalcon\Cache\Backend\Redis;
-use Library\PhpConsole, Library\Cache, Library\Logger, Library\Assets;
+use Library\{Cache, Logger, Assets};
 class Bootstrap extends Application{
 	public $di = null;
 	public function run()
@@ -39,6 +39,8 @@ class Bootstrap extends Application{
 		$this->initRequest();
 		$this->initDB();
 		$this->initLogger();
+		$logger   = $this->di->getShared('logger');
+		$logger->error('dddd');
 		$this->initErrorHandler();
 		$this->initSession();
 		$this->initDispatcher();
@@ -63,7 +65,7 @@ class Bootstrap extends Application{
 	protected function initConfig()
 	{
 		$this->di->setShared('config', function (){
-			return include APP_PATH . '/config/config.php';
+			return include APP_PATH . '/config.php';
 		});
 	}
 
@@ -119,12 +121,9 @@ class Bootstrap extends Application{
 	*/
 	protected function initLogger()
 	{
-		$db = $this->di->getShared('db');
-		$this->di->setShared('logger', function () use ($db_for_logger){
-			return new Logger([
-				'db' => $db_for_logger,
-				'table' => 'logs'
-			]);
+		$config   = $this->di->getShared('config')->get('logger');
+		$this->di->setShared('logger', function () use ($config){
+			return new Logger($config);
 		});
 	}
 	/**
@@ -132,12 +131,29 @@ class Bootstrap extends Application{
 	*/
 	protected function initErrorHandler()
 	{
-		$config = $this->di->getShared('config');
-		$client = new Raven_Client($config->get('debug')->get('url'));
-		$error_handler = new Raven_ErrorHandler($client);
-		$error_handler->registerExceptionHandler();
-		$error_handler->registerErrorHandler();
-		$error_handler->registerShutdownFunction();
+		$config   = $this->di->getShared('config');
+		$logger   = $this->di->getShared('logger');
+
+		ini_set('display_errors',$config->get('debug')->get('display_errors'));
+		error_reporting(E_ALL);
+
+		set_error_handler(
+			function ($errorNumber, $errorString, $errorFile, $errorLine) use ($logger) {
+				if (0 === $errorNumber & 0 === error_reporting()) {
+					return;
+				}
+				$logger->error(
+					sprintf("[%s] [%s] %s - %s",
+					$errorNumber, $errorLine, $errorString, $errorFile)
+				);
+			}
+		);
+
+		set_exception_handler(
+			function () use ($logger) {
+				$logger->error(json_encode(debug_backtrace()));
+			}
+		);
 	}
 	/**
 	* Initializes the Response
@@ -154,7 +170,6 @@ class Bootstrap extends Application{
 	*/
 	public function dispatch()
 	{
-
 		$router = $this->di->get('router');
 		$router->handle();
 		$view = $this->di->get('view');
@@ -207,25 +222,6 @@ class Bootstrap extends Application{
 	{
 		$dispatcher = new Dispatcher();
 		$dispatcher->setDefaultNamespace('Controller');
-		$config = $this->di->getShared('config');
-		if($config->get('debug')->get('profiler')){
-			$eventsManager = new EventsManager();
-			$profiler = new Profiler();
-			$this->di->set('profiler', $profiler);
-			$eventsManager->attach('db', function ($event, $db) use ($profiler) {
-				if ($event->getType() == 'beforeQuery') {
-					$profiler->startProfile($db->getSQLStatement());
-				}
-				if ($event->getType() == 'afterQuery') {
-					$profiler->stopProfile();
-				}
-			});
-			foreach ($config->get('db') as $db_name => $options) {
-				$db = $this->di->get($db_name);
-				$db->setEventsManager($eventsManager);
-			}
-
-		}
 		$this->di->setShared('dispatcher',$dispatcher);
 	}
 	/**
@@ -291,19 +287,17 @@ class Bootstrap extends Application{
 	protected function initDB()
 	{
 		$config = $this->di->getShared('config');
-		foreach ($config->get('db') as $db_name => $options) {
-			$this->di->setShared($db_name,function () use ($db_name, $options){
-				return new Mysql([
-					'host'     => $options->get('host'),
-					'port'     => $options->get('port'),
-					'username' => $options->get('username'),
-					'password' => $options->get('password'),
-					'dbname'   => $db_name,
-					'options' => [\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8']
-				]);
-			});
-		}
-		// Registering the Models-Metadata
+		$this->di->setShared("db",function () use ($config){
+			return new Mysql([
+				"host"     => $config->get('db')->get('host'),
+				"username" => $config->get('db')->get('username'),
+				"password" => $config->get('db')->get('password'),
+				"dbname"   => $config->get('db')->get('dbname'),
+				"options" => array(
+					\PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'
+				)
+			]);}
+		);
 		$this->di->setShared('modelsMetadata',function () use ($config) {
 			$options = [
 				'host'       => $config->get('redis')->get('host'),

@@ -25,11 +25,6 @@
 			</div>
 		</div>
 	</div>
-	<footer class="footer">
-		<div class="container">
-			<p class="pull-left">© БК "Бинго-Бум", 2017.</p>
-		</div>
-	</footer>
 	{{ assets.outputJs("footer_js") }}
 	{{ assets.outputJs() }}
 </body>
