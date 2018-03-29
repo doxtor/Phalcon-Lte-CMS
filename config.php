@@ -6,11 +6,6 @@ return new Config([
 		'compilevolt'     => true,
 		'display_errors'  => -1,
 	],
-	'logger' => [
-		'defaultFilename' => 'application',
-		'format'          => '[%date%][%type%] %message%',
-		'level'           => 'debug',
-	],
 	'db' => [
 		'host'            => 'localhost',
 		'username'        => 'root',

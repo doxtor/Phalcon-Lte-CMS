@@ -1,26 +1,22 @@
 <?php
 namespace Library;
 
-use Phalcon\Logger\Formatter\Line;
-use Phalcon\Logger\Adapter\File;
-class Logger extends File
+use Phalcon\Logger\Adapter;
+use Phalcon\Logger\AdapterInterface;
+class Logger extends Adapter implements AdapterInterface
 {
-	/**
-	* Cache constructor.
-	* @param $config
-	*/
-	public function __construct($config)
+	public function logInternal($message, $type, $time, $context = [])
 	{
-		$fileName = $config->get('defaultFilename', 'application');
-		$format = $config->get('format', '[%date%][%type%] %message%');
-		$logFile   = sprintf(
-				'%s/logs/%s-%s.log',
-				APP_PATH,
-				date('Ymd'),
-				$fileName
-		);
-		$logger    = new File($logFile);
-		$logger->setFormatter(new Line($format));
-		return $logger;
+		$logger = new \Model\Logger();
+		$logger->assign([
+			'type' => $type,
+			'message' => $message,
+		]);
+		$logger->save();
 	}
+	public function getFormatter(){}
+	public function close(){}
+	public function begin(){}
+	public function commit(){}
+	public function rollback(){}
 }

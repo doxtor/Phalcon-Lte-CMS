@@ -1,17 +1,14 @@
 <?php
 define('APP_PATH', dirname(__FILE__));
 include APP_PATH . '/Bootstrap.php';
-use Phalcon\Di\FactoryDefault\Cli as CliDI;
-use Phalcon\Cli\Console as ConsoleApp;
+use Phalcon\Di\FactoryDefault\Cli;
+use Phalcon\Cli\Console;
 use Phalcon\Loader;
-class Cli extends Bootstrap{
-	/**
-	 * @param $argv
-	 * @throws Exception
-	 */
+class Cli extends Bootstrap
+{
 	public function _run($argv)
 	{
-		$this->di = new CliDI();
+		$this->di = new Cli();
 		$this->initLoader();
 		$this->initConfig();
 		$this->registerDirs();
@@ -20,10 +17,10 @@ class Cli extends Bootstrap{
 		$this->initDB();
 		$this->initLogger();
 		$this->initErrorHandler();
-		$console = new ConsoleApp();
+		$console = new Console();
 		$console->setDI($this->di);
 		$arguments = [];
-
+		
 		foreach ($argv as $k => $arg) {
 			if ($k === 1) {
 				$arguments['task'] = $arg;
@@ -39,10 +36,6 @@ class Cli extends Bootstrap{
 			echo $e->getMessage();
 		}
 	}
-
-	/**
-	* Регистрация дириктории tasks.
-	*/
 	protected function registerDirs()
 	{
 		$loader = new Loader();

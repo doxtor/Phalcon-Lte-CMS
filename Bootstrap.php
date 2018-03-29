@@ -1,29 +1,22 @@
 <?php
 use Phalcon\DI;
 use Phalcon\Loader;
-use Phalcon\Security;
-use Phalcon\Escaper;
 use Phalcon\Mvc\Dispatcher;
 use Phalcon\Http\Response;
 use Phalcon\Http\Request;
 use Phalcon\Mvc\View;
 use Phalcon\Db\Adapter\Pdo\Mysql;
 use Phalcon\Mvc\Application;
-use Phalcon\Mvc\Router;
-use Phalcon\Debug;
-use Phalcon\Db\Profiler;
-
-use Phalcon\Session\Adapter\Redis as RedisSession;
-use Phalcon\Flash\Session;
-use Phalcon\Tag;
-use Phalcon\Mvc\View\Engine\Volt;
+use Phalcon\Logger\Formatter\Line;
+use Phalcon\Logger\Adapter\File;
 use Phalcon\Events\Event;
 use Phalcon\Events\Manager as EventsManager;
 use Phalcon\Mvc\Model\Manager as ModelsManager;
 use Phalcon\Mvc\Model\MetaData\Redis as MetaData;
 use Phalcon\Cache\Frontend\Data;
 use Phalcon\Cache\Backend\Redis;
-use Library\{Cache, Logger, Assets};
+
+use Library\Acl, Library\Logger, Library\Cache;
 class Bootstrap extends Application{
 	public $di = null;
 	public function run()
@@ -32,21 +25,18 @@ class Bootstrap extends Application{
 		$this->initLoader();
 		$this->initConfig();
 		$this->registerNamespaces();
-		$this->initOthers();
 		$this->initCache();
 		$this->initRoutes();
+		$this->initAcl();
 		$this->initResponse();
 		$this->initRequest();
 		$this->initDB();
 		$this->initLogger();
-		$logger   = $this->di->getShared('logger');
-		$logger->error('dddd');
 		$this->initErrorHandler();
 		$this->initSession();
 		$this->initDispatcher();
 		$this->initFlash();
 		$this->initView();
-		$this->initAssets();
 		$response = $this->dispatch($this->di);
 		$response->send();
 	}
@@ -59,20 +49,15 @@ class Bootstrap extends Application{
 	}
 	/**
 	* Initializes the Config container
-	*
-	* @throws Exception
 	*/
 	protected function initConfig()
 	{
 		$this->di->setShared('config', function (){
-			return include APP_PATH . '/config.php';
+			return include APP_PATH . "/config.php";
 		});
 	}
-
-	/**
-	*
-	*/
 	protected function registerNamespaces(){
+		$config = $this->di->getShared('config');
 		$loader = new Loader();
 		$loader->registerNamespaces([
 			'Controller' => APP_PATH . '/controllers/',
@@ -82,16 +67,8 @@ class Bootstrap extends Application{
 		]);
 		$loader->register();
 	}
-
-	/**
-	* Initializes others classes
-	*/
-	protected function initOthers(){
-		$this->di->setShared('security',function () {
-			$security = new Security();
-			$security->setWorkFactor(12);
-			return $security;
-		});
+	protected function initAcl(){
+		$this->di->set('access', new Acl($this->di));
 	}
 	/**
 	* Sets cache settings
@@ -103,27 +80,26 @@ class Bootstrap extends Application{
 		});
 	}
 	/**
-	* Initializes the routes
-	*/
+	 * Initializes the routes
+	 */
 	protected function initRoutes()
 	{
-		$this->di->setShared('router', function () {
-			$router = new Router();
-			$router->setDefaultController('request');
+		$this->di->setShared("router", function () {
+			$router = new \Phalcon\Mvc\Router();
+			$router->setDefaultController('index');
 			$router->add('/:controller/:action',         ['controller' => 1,'action' => 2]);
 			$router->add('/:controller/:action/:params', ['controller' => 1,'action' => 2, 'params' => 3]);
-			$router->add('/assets/([\w.-]+)',  ['controller' => 'admin', 'action' => 'clearasset', 'collection' => 1]);
 			return $router;
 		});
 	}
 	/**
-	* Initializes the loggers
-	*/
+	 * Initializes the loggers
+	 */
 	protected function initLogger()
 	{
-		$config   = $this->di->getShared('config')->get('logger');
-		$this->di->setShared('logger', function () use ($config){
-			return new Logger($config);
+		$config   = $this->di->getShared('config');
+		$this->di->setShared('logger', function () {
+			return new Logger();
 		});
 	}
 	/**
@@ -134,7 +110,7 @@ class Bootstrap extends Application{
 		$config   = $this->di->getShared('config');
 		$logger   = $this->di->getShared('logger');
 
-		ini_set('display_errors',$config->get('debug')->get('display_errors'));
+		ini_set('display_errors',$config->get('debug')->get('error_reporting'));
 		error_reporting(E_ALL);
 
 		set_error_handler(
@@ -160,12 +136,13 @@ class Bootstrap extends Application{
 	*/
 	protected function initResponse()
 	{
-		$this->di->setShared('response', function () {
+		$this->di->setShared("response",function () {
 			return new Response();
 		});
 	}
 	/**
 	* dispatch
+	* @param FactoryDefault $di
 	* @return mixed
 	*/
 	public function dispatch()
@@ -176,34 +153,43 @@ class Bootstrap extends Application{
 		$dispatcher = $this->di->get('dispatcher');
 		$response = $this->di->get('response');
 		$config = $this->di->get('config');
-		$controller_name = $router->getControllerName();
-		if(!$this->di->get('session')->get('role') && $controller_name != 'api'){
+		$access = $this->di->get('access');
+		if(!$access->haveAccess()){
+			echo 'da';
+			exit();
 			$dispatcher->setControllerName('user');
 			$dispatcher->setActionName('login');
 		}else{
-			$dispatcher->setControllerName($controller_name);
+			$dispatcher->setControllerName($router->getControllerName());
 			$dispatcher->setActionName(
 					$router->getActionName() ? $router->getActionName() : 'index'
 				);
 			$dispatcher->setParams($router->getParams());
 		}
-
-		try {
+		if ($config->get('debug')->get('enable')) {
+			error_reporting($config->get('debug')->get('error_reporting'));
+			$debug = new \Phalcon\Debug();
+			$debug->listen();
 			$dispatcher->dispatch();
-		} catch (\Phalcon\Exception $e) {
-			$view->start();
-				$view->e = $e;
-			if ($e instanceof \Phalcon\Mvc\Dispatcher\Exception) {
-				$response->setStatusCode(404, 'Not Found');
-				$view->partial(APP_PATH . '/views/error/show404');
-			} else {
-				$response->setStatusCode(503, 'Service Unavailable');
-				$view->partial(APP_PATH . '/views/error/show503');
+		} else {
+			try {
+				$dispatcher->dispatch();
+			} catch (\Phalcon\Exception $e) {
+				$view->start();
+					$view->e = $e;
+				if ($e instanceof \Phalcon\Mvc\Dispatcher\Exception) {
+					$response->setStatusCode(404, 'Not Found');
+					$view->partial(APP_PATH . '/views/error/show404');
+				} else {
+					$response->setStatusCode(503, 'Service Unavailable');
+					$view->partial(APP_PATH . '/views/error/show503');
+				}
+				return $response;
 			}
-			return $response;
 		}
+
 		$request = $this->di->get('request');
-		if (!$request->getQuery('_ajax') && $controller_name != 'api') {
+		if (!$request->getQuery('_ajax')) {
 			$view->start();
 			$view->render(
 				$dispatcher->getControllerName(),
@@ -221,15 +207,33 @@ class Bootstrap extends Application{
 	protected function initDispatcher()
 	{
 		$dispatcher = new Dispatcher();
-		$dispatcher->setDefaultNamespace('Controller');
-		$this->di->setShared('dispatcher',$dispatcher);
+		$dispatcher->setDefaultNamespace("Controller");
+		$config = $this->di->getShared('config');
+		if($config->get('debug')->get('profiler')){
+			$eventsManager = new EventsManager();
+			$profiler = new \Phalcon\Db\Profiler();
+			$this->di->set('profiler', $profiler);
+			$eventsManager->attach('db', function ($event, $db) use ($profiler) {
+			    if ($event->getType() == 'beforeQuery') {
+				   $profiler->startProfile($db->getSQLStatement());
+			    }
+			    if ($event->getType() == 'afterQuery') {
+				   $profiler->stopProfile();
+			    }
+			});
+			$db = $this->di->get('db');
+			$db->setEventsManager($eventsManager);
+			$halls = $this->di->get('halls');
+			$halls->setEventsManager($eventsManager);
+		}
+		$this->di->setShared("dispatcher",$dispatcher);
 	}
 	/**
 	* Initializes the Http\Request
 	*/
 	protected function initRequest()
 	{
-		$this->di->setShared('request', function () {
+		$this->di->setShared("request",function () {
 			return new Request();
 		});
 	}
@@ -243,19 +247,20 @@ class Bootstrap extends Application{
 			return new \Phalcon\Mvc\Url();
 		});
 		$this->di->setShared('tag', function () {
-			return new Tag();
+			return new \Phalcon\Tag();
 		});
 		$this->di->setShared('escaper', function () {
-			return new Escaper();
+			return new \Phalcon\Escaper();
 		});
 
 		$config = $this->di->getShared('config');
-		$this->di->setShared('view', function () use ($config){
-			$view = new View();
+		$this->di->setShared("view",function () use ($config){
+			$view = new \Phalcon\Mvc\View();
 			$view->setViewsDir(APP_PATH . '/views/');
 
 			$view->registerEngines(['.volt' => function ($view, $di) use ($config){
-				$volt = new Volt($view, $di);
+
+				$volt = new \Phalcon\Mvc\View\Engine\Volt($view, $di);
 				$volt->setOptions([
 					'compiledPath'      => APP_PATH . '/cache/',
 					'compiledSeparator' => '_',
@@ -266,19 +271,6 @@ class Bootstrap extends Application{
 				return $volt;
 			}]);
 			return $view;
-		});
-	}
-	/**
-	* Initializes the Assets manager
-	*/
-	protected function initAssets()
-	{
-		$cache = $this->di->getShared('cache');
-		$this->di->setShared('assets', function () use ($cache) {
-			$assets = new Assets();
-			$assets->_setCache($cache);
-			$assets->_getCache(APP_PATH . '/config/assets.php');
-			return $assets;
 		});
 	}
 	/**
@@ -298,7 +290,11 @@ class Bootstrap extends Application{
 				)
 			]);}
 		);
+		// Registering the Models-Metadata
 		$this->di->setShared('modelsMetadata',function () use ($config) {
+			$cacheFrontend = new Data([
+				'lifetime' => $config->get('redis')->get('lifetime'),
+			]);
 			$options = [
 				'host'       => $config->get('redis')->get('host'),
 				'port'       => $config->get('redis')->get('port'),
@@ -335,14 +331,15 @@ class Bootstrap extends Application{
 	protected function initSession()
 	{
 		$config = $this->di->getShared('config')->get('redis');
-		$this->di->setShared('session', function () use ($config) {
+		$this->di->setShared("session",function () use ($config) {
 			$options = [
 				'host'       => $config->get('host'),
 				'port'       => $config->get('port'),
 				'persistent' => $config->get('persistent'),
 				'lifetime'   => $config->get('lifetime'),
+				'prefix'     => $config->get('prefix'),
 			];
-			$session = new RedisSession($options);
+			$session = new \Phalcon\Session\Adapter\Redis($options);
 			$session->start();
 			return $session;
 		});
@@ -352,12 +349,12 @@ class Bootstrap extends Application{
 	*/
 	public function initFlash() {
 		$this->di->setShared('flash', function(){
-			$flash = new Session();
+			$flash = new \Phalcon\Flash\Session();
 			$flash->setCssClasses([
-				'error'   => 'alert alert-danger hidden',
-				'success' => 'alert alert-success hidden',
-				'notice'  => 'alert alert-info hidden',
-				'warning' => 'alert alert-warning hidden',
+				"error"   => "alert alert-danger hidden",
+				"success" => "alert alert-success hidden",
+				"notice"  => "alert alert-info hidden",
+				"warning" => "alert alert-warning hidden",
 				]);
 			return $flash;
 		});

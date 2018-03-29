@@ -2,4 +2,4 @@
 namespace Model;
 
 use Phalcon\Mvc\Model;
-class Users extends Model {}
+class Logger extends Model {}

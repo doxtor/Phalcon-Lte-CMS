@@ -7,12 +7,6 @@ use Phalcon\Cache\Frontend\Data;
 class Cache extends Component
 {
 	public $cache;
-	public $log;
-
-	/**
-	* Cache constructor.
-	* @param $config
-	*/
 	public function __construct($config)
 	{
 		$cacheFrontend = new Data([
@@ -27,87 +21,23 @@ class Cache extends Component
 			'prefix'     => $config->get('prefix'),
 		];
 		$this->cache = new Redis($cacheFrontend, $options);
-		$this->log = [];
 	}
-	/**
-	* Get var in Redis
-	*
-	* @param $key Key var
-	* @param $lifetime
-	*
-	* @return var
-	*
-	*/
 	public function get($key, $lifetime = null)
 	{
-		$result = $this->cache->get($key, $lifetime);
-		if($result){
-			$this->log[] = ['type' => 'get','key' => $key];
-		}
-		return $result;
+		return $this->cache->get($key, $lifetime);
 	}
-	/**
-	* Save var in Redis
-	*
-	* @param $key Key var
-	* @param $data var
-	* @param $lifetime
-	*
-	* @return bool
-	*
-	*/
 	public function save($key, $data, $lifetime = null)
 	{
-		$result = $this->cache->save($key, $data, $lifetime);
-		if($result){
-			$this->log[] = ['type' => 'save','key' => $key];
-		}
-		return $result;
+		return $this->cache->save($key, $data, $lifetime);
 	}
-	/**
-	* Set var in Redis
-	* Like as Save method
-	*
-	* @param $key Key var
-	* @param $data var
-	* @param $lifetime
-	*
-	* @return bool
-	*
-	*/
 	public function set($key, $data, $lifetime = null)
 	{
-		$result = $this->cache->save($key, $data, $lifetime);
-		if($result){
-			$this->log[] = ['type' => 'set','key' => $key];
-		}
-		return $result;
+		return $this->cache->save($key, $data, $lifetime);
 	}
-	/**
-	* Delete var in Redis
-	*
-	* @param $key Key var
-	*
-	* @return bool
-	*
-	*/
 	public function delete($key)
 	{
-		$result = $this->cache->delete($key);
-		if($result){
-			$this->log[] = ['type' => 'delete','key' => $key];
-		}
-		return $result;
+		return $this->cache->delete($key);
 	}
-	/**
-	* Query
-	* For get all keys vars in Redis save
-	*
-	* @param $prefix
-	*
-	* @return array keys
-	*
-	*/
 	public function queryKeys($prefix = null){
 		return $this->cache->queryKeys($prefix);
 	}

@@ -8,8 +8,7 @@
 	<meta name="description" content="">
 	<meta name="author" content="">
 	{{ get_title() }}
-	{{ assets.outputCss("header_css") }}
-	{{ assets.outputCss() }}
+	<link rel="stylesheet" type="text/css" href="/css/bootstrap.min.css" />
 </head>
 <body>
 	<div id="wrapper">
@@ -25,7 +24,7 @@
 			</div>
 		</div>
 	</div>
-	{{ assets.outputJs("footer_js") }}
-	{{ assets.outputJs() }}
+	<script type="text/javascript" src="/js/jquery.min.js"></script>
+	<script type="text/javascript" src="/js/bootstrap.min.js"></script>
 </body>
 </html>
