@@ -1,5 +1,3 @@
 <?php
 namespace Model;
-
-use Phalcon\Mvc\Model;
-class Acl extends Model {}
+class Acl extends \Phalcon\Mvc\Model{}

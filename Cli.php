@@ -1,14 +1,11 @@
 <?php
-define('APP_PATH', dirname(__FILE__));
-include APP_PATH . '/Bootstrap.php';
-use Phalcon\Di\FactoryDefault\Cli;
-use Phalcon\Cli\Console;
-use Phalcon\Loader;
+define('BASE_PATH', dirname(__FILE__));
+include BASE_PATH . '/Bootstrap.php';
 class Cli extends Bootstrap
 {
 	public function _run($argv)
 	{
-		$this->di = new Cli();
+		$this->di = new \Phalcon\Di\FactoryDefault\Cli();
 		$this->initLoader();
 		$this->initConfig();
 		$this->registerDirs();
@@ -17,10 +14,10 @@ class Cli extends Bootstrap
 		$this->initDB();
 		$this->initLogger();
 		$this->initErrorHandler();
-		$console = new Console();
+		$console = new \Phalcon\Cli\Console();
 		$console->setDI($this->di);
 		$arguments = [];
-		
+
 		foreach ($argv as $k => $arg) {
 			if ($k === 1) {
 				$arguments['task'] = $arg;
@@ -38,8 +35,8 @@ class Cli extends Bootstrap
 	}
 	protected function registerDirs()
 	{
-		$loader = new Loader();
-		$loader->registerDirs([APP_PATH . '/tasks/']);
+		$loader = new \Phalcon\Loader();
+		$loader->registerDirs([BASE_PATH . '/tasks/']);
 		$loader->register();
 	}
 }

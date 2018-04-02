@@ -1,9 +1,6 @@
 <?php
 namespace Library;
-
-use Phalcon\Logger\Adapter;
-use Phalcon\Logger\AdapterInterface;
-class Logger extends Adapter implements AdapterInterface
+class Logger extends \Phalcon\Logger\Adapter implements \Phalcon\Logger\AdapterInterface
 {
 	public function logInternal($message, $type, $time, $context = [])
 	{
@@ -15,8 +12,8 @@ class Logger extends Adapter implements AdapterInterface
 		$logger->save();
 	}
 	public function getFormatter(){}
-	public function close(){}
-	public function begin(){}
-	public function commit(){}
-	public function rollback(){}
+	public function close()       {}
+	public function begin()       {}
+	public function commit()      {}
+	public function rollback()    {}
 }

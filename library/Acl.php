@@ -1,9 +1,15 @@
 <?php
 namespace Library;
-use Phalcon\Mvc\User\Component;
-class Acl extends Component{
+class Acl extends \Phalcon\Acl\Adapter\Memory{
 	private $access = null;
-	public function haveAccess($action = null,$controller = null){
+	public function init()
+	{
+		$this->di->setShared('access', function(){
+			return new \Library\Acl($this->di);
+		});
+	}
+	public function haveAccess($action = null, $controller = null)
+	{
 		if(isset($this->access[$controller][$action])){
 			return $this->access[$controller][$action];
 		}

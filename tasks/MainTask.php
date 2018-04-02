@@ -1,5 +1,6 @@
 <?php
-use Phalcon\Cli\Task;
-class MainTask extends Task
-{
+class MainTask extends \Phalcon\Cli\Task{
+	public function mainAction(){
+		echo 'This default task';
+	}
 }

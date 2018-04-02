@@ -1,15 +1,12 @@
 <?php
 namespace Library;
 
-use Phalcon\Mvc\User\Component;
-use Phalcon\Cache\Backend\Redis;
-use Phalcon\Cache\Frontend\Data;
-class Cache extends Component
+class Cache extends \Phalcon\Mvc\User\Component
 {
 	public $cache;
 	public function __construct($config)
 	{
-		$cacheFrontend = new Data([
+		$cacheFrontend = new \Phalcon\Cache\Frontend\Data([
 			'lifetime' => $config->get('lifetime'),
 		]);
 		$options = [
@@ -20,25 +17,11 @@ class Cache extends Component
 			'lifetime'   => $config->get('lifetime'),
 			'prefix'     => $config->get('prefix'),
 		];
-		$this->cache = new Redis($cacheFrontend, $options);
+		$this->cache = new \Phalcon\Cache\Backend\Redis($cacheFrontend, $options);
 	}
-	public function get($key, $lifetime = null)
-	{
-		return $this->cache->get($key, $lifetime);
-	}
-	public function save($key, $data, $lifetime = null)
-	{
-		return $this->cache->save($key, $data, $lifetime);
-	}
-	public function set($key, $data, $lifetime = null)
-	{
-		return $this->cache->save($key, $data, $lifetime);
-	}
-	public function delete($key)
-	{
-		return $this->cache->delete($key);
-	}
-	public function queryKeys($prefix = null){
-		return $this->cache->queryKeys($prefix);
-	}
+	public function get($key, $lifetime = null)        {return $this->cache->get($key, $lifetime);        }
+	public function save($key, $data, $lifetime = null){return $this->cache->save($key, $data, $lifetime);}
+	public function set($key, $data, $lifetime = null) {return $this->cache->save($key, $data, $lifetime);}
+	public function delete($key)                       {return $this->cache->delete($key);                }
+	public function queryKeys($prefix = null)          {return $this->cache->queryKeys($prefix);          }
 }

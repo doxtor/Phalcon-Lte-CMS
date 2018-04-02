@@ -3,7 +3,6 @@ use Phalcon\Config;
 return new Config([
 	'debug' => [
 		'enable'          => true,
-		'compilevolt'     => true,
 		'display_errors'  => -1,
 	],
 	'db' => [

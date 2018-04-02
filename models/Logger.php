@@ -1,5 +1,3 @@
 <?php
 namespace Model;
-
-use Phalcon\Mvc\Model;
-class Logger extends Model {}
+class Logger extends \Phalcon\Mvc\Model{}
