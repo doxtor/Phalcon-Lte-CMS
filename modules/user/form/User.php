@@ -3,7 +3,7 @@ namespace Form;
 
 use Phalcon\Forms\Form;
 use Phalcon\Forms\Element\{Text, TextArea, Hidden};
-class UsersForm extends Form
+class User extends \Library\Form
 {
 	/**
 	* Инициализация формы для добовление в черный список.

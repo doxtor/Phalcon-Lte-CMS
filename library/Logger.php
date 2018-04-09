@@ -4,12 +4,12 @@ class Logger extends \Phalcon\Logger\Adapter implements \Phalcon\Logger\AdapterI
 {
 	public function logInternal($message, $type, $time, $context = [])
 	{
-		$logger = new \Model\Logger();
+		/*$logger = new \Library\LoggerModel();
 		$logger->assign([
 			'type' => $type,
 			'message' => $message,
 		]);
-		$logger->save();
+		$logger->save();*/
 	}
 	public function getFormatter(){}
 	public function close()       {}

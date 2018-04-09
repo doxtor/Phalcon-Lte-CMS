@@ -7,7 +7,6 @@ CREATE TABLE IF NOT EXISTS `logger` (
 CREATE TABLE `acl` (
   `id` int(11) NOT NULL,
   `controller` char(15) NOT NULL,
-  `action` char(15) NOT NULL
+  `action` char(15) NOT NULL,
+  PRIMARY KEY (`id`,`controller`,`action`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Table for ACL';
-ALTER TABLE `acl`
-  ADD PRIMARY KEY (`id`,`controller`,`action`);

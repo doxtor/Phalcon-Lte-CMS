@@ -25,10 +25,17 @@ class Bootstrap extends Application{
 	}
 	protected function dispatch()
 	{
+
 		$router = $this->di->get('router');
 		$router->handle();
 		$view = $this->di->get('view');
 		$dispatcher = $this->di->get('dispatcher');
+
+		$dispatcher->setModuleName($router->getModuleName());
+		$dispatcher->setControllerName($router->getControllerName());
+		$dispatcher->setActionName($router->getActionName());
+		$dispatcher->setParams($router->getParams());
+		$dispatcher->setDefaultNamespace(ucfirst($router->getModuleName())."\Controller");
 		$response = $this->di->get('response');
 		$config = $this->di->get('config');
 		/*$access = $this->di->get('acl');
@@ -40,14 +47,21 @@ class Bootstrap extends Application{
 			$dispatcher->setActionName($router->getActionName() ? $router->getActionName() : 'index');
 			$dispatcher->setParams($router->getParams());
 		}*/
-		try {
+		//$view->setLayout('list');
+		//echo $view->getLayout();
+		$view->setViewsDir(BASE_PATH . '/modules/' . $router->getModuleName() . '/views/');
+
+		//try {
 			$debug = new \Phalcon\Debug();
 			$debug->listen();
 			$dispatcher->dispatch();
-		} catch (\Phalcon\Exception $e) {
+		/*} catch (\Phalcon\Exception $e) {
 			$view->start();
-			$view->e = $e;
+			$view->setPartialsDir('');
+			$view->setViewsDir(BASE_PATH . '/views/');
+
 			if ($e instanceof \Phalcon\Mvc\Dispatcher\Exception) {
+				$view->e = $e;
 				$response->setStatusCode(404, 'Not Found');
 				$view->partial(BASE_PATH . '/views/error/show404');
 			} else {
@@ -55,7 +69,7 @@ class Bootstrap extends Application{
 				$view->partial(BASE_PATH . '/views/error/show503');
 			}
 			return $response;
-		}
+		}*/
 		$request = $this->di->get('request');
 		if (!$request->getQuery('_ajax')) {
 			$view->start();
@@ -81,12 +95,16 @@ class Bootstrap extends Application{
 	}
 	protected function registerNamespaces(){
 		$loader = new \Phalcon\Loader();
-		$loader->registerNamespaces([
-			'Controller' => BASE_PATH . '/controllers/',
-			'Model' => BASE_PATH . '/models/',
-			'Form' => BASE_PATH . '/forms/',
-			'Library' => BASE_PATH . '/library/'
-		]);
+		$modules = ['content', 'admin', 'user'];
+		$nameSpaces = ['Library' => BASE_PATH . '/library/'];
+		foreach ($modules as $module) {
+			$name = ucfirst($module);
+			$nameSpaces[$name] = BASE_PATH.'/modules/'.$module;
+			$nameSpaces[$name.'\Controller'] = BASE_PATH.'/modules/'.$module.'/controller/';
+			$nameSpaces[$name.'\Model'] = BASE_PATH.'/modules/'.$module.'/model/';
+			$nameSpaces[$name.'\Form'] = BASE_PATH.'/modules/'.$module.'/form/';
+		}
+		$loader->registerNamespaces($nameSpaces, true);
 		$loader->register();
 	}
 	protected function initErrorHandler()
@@ -122,9 +140,7 @@ class Bootstrap extends Application{
 
 	protected function initDispatcher(){
 		$this->di->setShared('dispatcher', function() {
-			$dispatcher = new \Phalcon\Mvc\Dispatcher();
-			$dispatcher->setDefaultNamespace('Controller');
-			return $dispatcher;
+			return new \Library\Dispatcher();
 		});
 	}
 	protected function initRequest(){
@@ -166,7 +182,7 @@ class Bootstrap extends Application{
 		$this->di->setShared('escaper', function () {
 			return new \Phalcon\Escaper();
 		});
-		$this->di->set('view', function () {
+		$this->di->setShared('view', function () {
 			return new \Library\View();
 		});
 		$view = $this->di->get('view'); $di = $this->di;

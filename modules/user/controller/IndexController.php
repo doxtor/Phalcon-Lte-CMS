@@ -1,7 +1,7 @@
 <?php
 namespace Controller;
 use Model\Logger;
-class IndexController extends \Phalcon\Mvc\Controller
+class IndexController extends \Library\Controller
 {
 	public function indexAction(){
 		$this->tag->setTitle('Test');
