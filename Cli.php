@@ -1,7 +1,10 @@
 <?php
 define('BASE_PATH', dirname(__FILE__));
-include BASE_PATH . '/Bootstrap.php';
-class Cli extends Bootstrap
+(new \Phalcon\Loader())
+	->registerNamespaces(['Library' => BASE_PATH . '/library/'], true)
+	->register();
+
+class Cli extends \Library\Bootstrap
 {
 	public function _run($argv)
 	{

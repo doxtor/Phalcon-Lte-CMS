@@ -6,77 +6,55 @@ class AdminController extends \Library\Controller{
 	public $form;
 	public $variables;
 	public $list;
+	public $builder;
 
-	public function indexAction(){
-		parent::setTitle($this->getModuleTitle());
-		$this->limit = $this->request->getQuery('limit', 'int', 10);
-		$modelClass = $this->table;
-		$primaryKeyName = $modelClass::PRIMARY_KEY;
+	/*public function indexAction(){
+		if($this->request->isAjax()){
+			$draw = (int) $this->request->getPost('draw');
+			$start = (int) $this->request->getPost('start');
+			$limit = (int) $this->request->getPost('length');
 
-		$columns = [];
-		foreach ($this->list as $key => $value) {
-			if(isset($value['sql']) && $value['sql']){
-				$columns[] = $key;
+			if(!$limit) return;
+			$currentPage = $limit ? ($start + $limit)/$limit : 1;
+			$modelClass = $this->table;
+			$primaryKeyName = $modelClass::PRIMARY_KEY;
+
+			$columns = [];
+			foreach ($this->list as $key => $value) {
+				if(isset($value['sql']) && $value['sql']){
+					$columns[] = $key;
+				}
 			}
-		}
+			$qb = $this->modelsManager->createBuilder()
+				->columns($columns)
+				->addFrom($this->table);
 
-		$module = $this->router->getModuleName();
-		$this->limit = $this->request->getQuery('limit', 'string',$this->limit);
-		$qb = $this->modelsManager->createBuilder()
-			->columns($columns)
-			->addFrom($this->table);
+			$this->builder = $this->modelsManager->createBuilder()->columns($columns);
+			$this->builder->addFrom($this->table, 'e');
 
-		if (isset($this->list['actions']) && isset($this->list['actions']['sortable'])) {
-			$orderColumnName = $this->list['actions']['orderColumnName'];
-			$columns[] = $orderColumnName;
-			$qb->columns($columns);
-			$qb->orderBy($orderColumnName);
-
-			$this->view->is_sortable = true;
-			$this->view->order_column_name = $orderColumnName;
-			$this->view->sort_link = $this->url->get([
-				'for' => 'default',
-				'module' => $module,
-				'controller' => $this->router->getControllerName(),
-				'action' => 'sort'
-			]);
-		} else {
-			$this->view->is_sortable = false;
-		}
-
-		$this->view->list = $this->list;
-		$paginator = new \Library\MyPaginator(
-			[
-				"builder" => $qb,
-				"limit"   => $this->limit,
-				"page"    => $this->request->getQuery('page','int',1),
-				//"total"		=> 100,
-			]
-		);
-		$this->view->pagination = $paginator->getPaginate();
-		$this->view->limit = $this->limit;
-		$this->view->edit_link = $this->url->get([
-			'for' => 'default',
-			'module' => $module,
-			'controller' => $this->router->getControllerName(),
-			'action' => 'edit'
-		]);
-
-		$this->view->primary_key_name = $primaryKeyName;
-
-		if (file_exists(APP.'/modules/'.$module.'/forms/Config.php')){
-			$this->view->config_link = $this->url->get([
-				'for' => 'default',
-				'module' => 'config',
-				'controller' => 'config',
-				'action' => 'edit',
-				'params' => $module
-			]);
+			$page = (new PaginatorQueryBuilder([
+					'builder' => $this->builder,
+					'limit' => $limit,
+					'page'  => $currentPage,
+				]))->getPaginate();
+			$data = [
+					'draw' => $draw,
+					'recordsTotal' => $page->total_items,
+					'recordsFiltered' => $page->total_items
+				];
+			$i = 0; $data['data'] = [];
+			foreach ($page->items as $item) {
+				$data['data'][$i][] = $item->id;
+				$data['data'][$i][] = $item->name;
+				$i++;
+			}
+			$this->response->setContentType('application/json', 'UTF-8');
+			$this->response->setJsonContent($data);
 		}else{
-			$this->view->config_link = false;
+			parent::setTitle($this->getModuleTitle());
+			$this->view->setLayout('list');
 		}
-		$this->view->setLayout('list');
-	}
+	}*/
 	public function editAction($primaryKeyValue = null){
 		$modelClass = $this->table;
 		$primaryKeyName = $modelClass::PRIMARY_KEY;

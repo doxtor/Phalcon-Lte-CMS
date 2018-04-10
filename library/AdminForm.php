@@ -1,4 +1,5 @@
 <?php
+namespace Library;
 class AdminForm extends Phalcon\Forms\Form
 {
 	public function initialize($variables = null, $value = null) {

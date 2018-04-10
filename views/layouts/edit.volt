@@ -1,11 +1,3 @@
-<section class="content-header">
-	<h1>
-	{{ get_title('') }}
-	</h1>
-	<ol class="breadcrumb">
-	{{ partial('breadcrumb') }}
-	</ol>
-</section>
 <section class="content">
 <form action="{{ save_link }}" method="post" enctype="multipart/form-data">
 {% for namegroup, items in variables %}

@@ -1,4 +1,4 @@
-<table class="table">
+<table id="MainTable">
 	<thead>
 		<tr>
 			{% for item in list %} {% if item['sql'] is defined %}

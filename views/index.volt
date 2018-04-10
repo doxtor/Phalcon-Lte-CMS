@@ -6,18 +6,17 @@
 	<meta name="description" content="">
 	<meta name="author" content="">
 	{{ get_title() }}
-	<link href="/css/bootstrap.min.css" rel="stylesheet">
-	<link href="/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-	<link href="/css/clean-blog.min.css" rel="stylesheet">
+	<link href="/css/bootstrap.css" rel="stylesheet">
+	<link href="/css/fontawesome-all.min.css" rel="stylesheet" type="text/css">
+	<link href="/css/jquery.dataTables.css" rel="stylesheet" type="text/css">
 </head>
 <body>
 	{{ partial('menu') }}
-	{{ partial('header') }}
 	{{ flash.output() }}
 	{{ content() }}
-	<hr>
-	{{ partial('footer') }}
 	<script src="/js/jquery.min.js"></script>
-	<script src="/js/clean-blog.min.js"></script>
+	<script src="/js/bootstrap.js"></script>
+	<script src="/js/jquery.dataTables.min.js"></script>
+	<script src="/js/list.js"></script>
 </body>
 </html>

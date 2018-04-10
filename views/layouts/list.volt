@@ -1,14 +1,3 @@
-<section class="content-header">
-	<h1>
-	{{ get_title('') }}
-	{% if config_link %}
-		<small><a href="{{ config_link }}"><i class="fa fa-gear"></i>&nbsp;Настройки</a></small>
-	{% endif %}
-	</h1>
-	<ol class="breadcrumb">
-		{{ partial('breadcrumb') }}
-	</ol>
-</section>
 <section class="content">
 <div class="row">
 	<div class="col-xs-12">

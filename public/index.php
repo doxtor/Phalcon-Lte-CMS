@@ -1,8 +1,11 @@
 <?php
 define('BASE_PATH', realpath('..'));
+(new \Phalcon\Loader())
+	->registerNamespaces(['Library' => BASE_PATH . '/library/'], true)
+	->register();
 try {
-	require_once BASE_PATH . '/Bootstrap.php';
-	echo (new \Bootstrap())->run();
+	$app = new \Library\Bootstrap();
+	echo $app->run();
 } catch (\Exception $e) {
 	echo $e->getMessage();
 }
