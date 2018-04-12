@@ -5,7 +5,7 @@ class Acl extends \Phalcon\Acl\Adapter\Memory{
 	public function init()
 	{
 		$this->di->setShared('access', function(){
-			return new \Library\Acl($this->di);
+			return new Acl($this->di);
 		});
 	}
 	public function haveAccess($action = null, $controller = null)

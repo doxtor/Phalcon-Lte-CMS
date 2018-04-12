@@ -6,17 +6,15 @@
 	<meta name="description" content="">
 	<meta name="author" content="">
 	{{ get_title() }}
-	<link href="/css/bootstrap.css" rel="stylesheet">
-	<link href="/css/fontawesome-all.min.css" rel="stylesheet" type="text/css">
-	<link href="/css/jquery.dataTables.css" rel="stylesheet" type="text/css">
+	{{ assets.outputCss('header_css') }}
+	{{ assets.outputCss() }}
 </head>
 <body>
 	{{ partial('menu') }}
 	{{ flash.output() }}
 	{{ content() }}
-	<script src="/js/jquery.min.js"></script>
-	<script src="/js/bootstrap.js"></script>
-	<script src="/js/jquery.dataTables.min.js"></script>
-	<script src="/js/list.js"></script>
+	{{ assets.outputJs('footer_js') }}
+	{% do assets.addJs('js/list.js') %}
+	{{ assets.outputJs() }}
 </body>
 </html>

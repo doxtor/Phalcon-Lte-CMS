@@ -1,11 +1,9 @@
 <?php
 namespace Library;
 
-class Cache extends \Phalcon\Mvc\User\Component
-{
+class Cache extends \Phalcon\Mvc\User\Component{
 	public $cache;
-	public function __construct($config)
-	{
+	public function __construct($config){
 		$cacheFrontend = new \Phalcon\Cache\Frontend\Data([
 			'lifetime' => $config->get('lifetime'),
 		]);

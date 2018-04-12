@@ -2,9 +2,8 @@
 namespace Library;
 class Logger extends \Phalcon\Logger\Adapter implements \Phalcon\Logger\AdapterInterface
 {
-	public function logInternal($message, $type, $time, $context = [])
-	{
-		/*$logger = new \Library\LoggerModel();
+	public function logInternal($message, $type, $time, $context = []){
+		/*$logger = new LoggerModel();
 		$logger->assign([
 			'type' => $type,
 			'message' => $message,

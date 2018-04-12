@@ -1,9 +1,6 @@
 <?php
 namespace Library;
-use Phalcon\Paginator\AdapterInterface as PaginatorInterface;
-
-class MyPaginator implements PaginatorInterface
-{
+class MyPaginator implements \Phalcon\Paginator\AdapterInterface{
 	/** @var Phalcon\Mvc\Model\Query\Builder $builder  */
 	public $builder;
 	public $limit;

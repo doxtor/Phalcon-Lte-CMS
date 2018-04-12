@@ -1,8 +1,7 @@
 <?php
 namespace Library;
 class modelsMetadata extends \Phalcon\Mvc\Model\MetaData\Redis{
-	public function __construct($config)
-	{
+	public function __construct($config){
 		$options = [
 			'host'       => $config->get('host'),
 			'port'       => $config->get('port'),

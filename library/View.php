@@ -6,6 +6,5 @@ class View extends \Phalcon\Mvc\View{
 		$this->setLayoutsDir(VIEWS_PATH . '/layouts/');
 		$this->setPartialsDir(VIEWS_PATH . '/partials/');
 		$this->registerEngines(['.volt' => 'volt']);
-		//$this->setLayout('main');
 	}
 }

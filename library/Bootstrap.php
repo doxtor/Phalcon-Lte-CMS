@@ -4,8 +4,8 @@ use Phalcon\Mvc\Application;
 class Bootstrap extends Application{
 	public $di = null;
 	public function run(){
-		define('VIEWS_PATH', BASE_PATH . '/views/');
 		$this->di = new \Phalcon\Di\FactoryDefault();
+		$this->initFolders();
 		$this->initLoader();
 		$this->initConfig();
 		$this->registerNamespaces();
@@ -21,8 +21,16 @@ class Bootstrap extends Application{
 		$this->initDispatcher();
 		$this->initFlash();
 		$this->initView();
+		$this->initAssets();
 		$response = $this->dispatch();
 		$response->send();
+	}
+	protected function initFolders()
+	{
+		define('VIEWS_PATH', BASE_PATH . '/views/');
+		define('CACHE_PATH', BASE_PATH . '/cache/');
+		define('ASSETS_PATH', BASE_PATH . '/public/assets/');
+		define('ASSETS_URL', 'assets/');
 	}
 	protected function dispatch()
 	{
@@ -110,67 +118,67 @@ class Bootstrap extends Application{
 	}
 	protected function initErrorHandler()
 	{
-		new \Library\ErrorHandler();
+		new ErrorHandler();
 	}
 	protected function initAcl(){
-		//(new \Library\Acl($this->di))->init();
+		//(new Acl($this->di))->init();
 	}
 	public function initCache(){
 		$config = $this->di->getShared('config')->get('redis');
 		$this->di->setShared('cache', function() use ($config) {
-			return new \Library\Cache($config);
+			return new Cache($config);
 		});
 	}
 	protected function initRouter()
 	{
 		$this->di->setShared("router", function () {
-			return new \Library\Router();
+			return new Router();
 		});
 	}
 	protected function initLogger()
 	{
 		$this->di->setShared('logger', function () {
-			return new \Library\Logger();
+			return new Logger();
 		});
 	}
 	protected function initResponse(){
 		$this->di->setShared('response',function () {
-			return new \Library\Response();
+			return new Response();
 		});
 	}
 
 	protected function initDispatcher(){
 		$this->di->setShared('dispatcher', function() {
-			return new \Library\Dispatcher();
+			return new Dispatcher();
 		});
 	}
 	protected function initRequest(){
 		$this->di->setShared('request',function () {
-			return new \Library\Request();
+			return new Request();
 		});
 	}
 	protected function initFlash(){
 		$this->di->setShared('flash', function(){
-			return new \Library\Flash();
+			return new Flash();
 		});
 	}
 	protected function initSession(){
 		$config = $this->di->getShared('config')->get('redis');
 		$this->di->setShared('session', function() use ($config){
-			return new \Library\Session($config);
+			return new Session($config);
 		});
 	}
 	protected function initDB(){
 		$config = $this->di->getShared('config')->get('db');
 		$this->di->setShared('db', function() use ($config){
-			return new \Library\DB($config);
+			return new DB($config);
 		});
 		$config = $this->di->getShared('config')->get('redis');
 		$this->di->setShared('modelsMetadata', function() use ($config){
-			return new \Library\modelsMetadata($config);
+			return new modelsMetadata($config);
 		});
 		$this->di->setShared('modelsCache', function() use ($config){
-			return new \Library\modelsCache($config);
+			return new modelsCache($config);
 		});
 	}
 	protected function initView($client = 'site'){
@@ -184,11 +192,21 @@ class Bootstrap extends Application{
 			return new \Phalcon\Escaper();
 		});
 		$this->di->setShared('view', function () {
-			return new \Library\View();
+			return new View();
 		});
 		$view = $this->di->get('view'); $di = $this->di;
 		$this->di->setShared('volt', function ($view, $di) {
-			return new \Library\Volt($view, $di);
+			return new Volt($view, $di);
+		});
+	}
+	protected function initAssets()
+	{
+		$cache = $this->di->getShared('cache');
+		$this->di->setShared('assets', function () use ($cache) {
+			$assets = new Assets();
+			$assets->_setCache($cache);
+			$assets->_getCache();
+			return $assets;
 		});
 	}
 }

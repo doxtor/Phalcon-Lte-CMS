@@ -1,7 +1,7 @@
 <?php
 namespace Library;
 
-class AdminController extends \Library\Controller{
+class AdminController extends Controller{
 	public $table;
 	public $form;
 	public $variables;
