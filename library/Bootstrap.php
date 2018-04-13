@@ -27,6 +27,7 @@ class Bootstrap extends Application{
 	}
 	protected function initFolders()
 	{
+		define('MODELS_PATH', BASE_PATH . '/modules/');
 		define('VIEWS_PATH', BASE_PATH . '/views/');
 		define('CACHE_PATH', BASE_PATH . '/cache/');
 		define('ASSETS_PATH', BASE_PATH . '/public/assets/');
@@ -58,8 +59,7 @@ class Bootstrap extends Application{
 		}*/
 		//$view->setLayout('list');
 		//echo $view->getLayout();
-		$view->setViewsDir(BASE_PATH . '/modules/' . $router->getModuleName() . '/views/');
-
+		$view->setViewsDir(MODELS_PATH . $router->getModuleName() . '/Views/');
 		try {
 			$debug = new \Phalcon\Debug();
 			$debug->listen();
@@ -105,13 +105,8 @@ class Bootstrap extends Application{
 	protected function registerNamespaces(){
 		$loader = new \Phalcon\Loader();
 		$modules = ['content', 'admin', 'user'];
-		$nameSpaces = ['Library' => BASE_PATH . '/library/'];
 		foreach ($modules as $module) {
-			$name = ucfirst($module);
-			$nameSpaces[$name] = BASE_PATH.'/modules/'.$module;
-			$nameSpaces[$name.'\Controller'] = BASE_PATH.'/modules/'.$module.'/controller/';
-			$nameSpaces[$name.'\Model'] = BASE_PATH.'/modules/'.$module.'/model/';
-			$nameSpaces[$name.'\Form'] = BASE_PATH.'/modules/'.$module.'/form/';
+			$nameSpaces[ucfirst($module)] = MODELS_PATH .$module;
 		}
 		$loader->registerNamespaces($nameSpaces, true);
 		$loader->register();

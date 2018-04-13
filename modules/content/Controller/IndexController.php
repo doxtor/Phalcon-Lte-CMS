@@ -4,6 +4,7 @@ use Library\Model\Logger;
 class IndexController extends \Library\Controller
 {
 	public function indexAction(){
-		$this->tag->setTitle('Test');
+		print_r(\Content\Model\Content::find()->toArray());
+		$this->tag->setTitle('Test 123');
 	}
 }

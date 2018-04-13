@@ -1,7 +1,9 @@
 <?php
 define('BASE_PATH', realpath('..'));
+define('LIBRARY_PATH', BASE_PATH . '/library/');
+
 (new \Phalcon\Loader())
-	->registerNamespaces(['Library' => BASE_PATH . '/library/'], true)
+	->registerNamespaces(['Library' => LIBRARY_PATH], true)
 	->register();
 try {
 	$app = new \Library\Bootstrap();
