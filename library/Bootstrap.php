@@ -11,7 +11,6 @@ class Bootstrap extends Application{
 		$this->registerNamespaces();
 		$this->initCache();
 		$this->initRouter();
-		$this->initAcl();
 		$this->initResponse();
 		$this->initRequest();
 		$this->initDB();
@@ -27,8 +26,8 @@ class Bootstrap extends Application{
 	}
 	protected function initFolders()
 	{
-		define('MODELS_PATH', BASE_PATH . '/modules/');
-		define('VIEWS_PATH', BASE_PATH . '/views/');
+		define('MODULES_PATH', BASE_PATH . '/modules/');
+		define('VIEWS_PATH', BASE_PATH . '/views/site/');
 		define('CACHE_PATH', BASE_PATH . '/cache/');
 		define('ASSETS_PATH', BASE_PATH . '/public/assets/');
 		define('ASSETS_URL', 'assets/');
@@ -48,18 +47,7 @@ class Bootstrap extends Application{
 		$dispatcher->setDefaultNamespace(ucfirst($router->getModuleName())."\Controller");
 		$response = $this->di->get('response');
 		$config = $this->di->get('config');
-		/*$access = $this->di->get('acl');
-		if(!$access->haveAccess()){
-			$dispatcher->setControllerName('user');
-			$dispatcher->setActionName('login');
-		}else{
-			$dispatcher->setControllerName($router->getControllerName());
-			$dispatcher->setActionName($router->getActionName() ? $router->getActionName() : 'index');
-			$dispatcher->setParams($router->getParams());
-		}*/
-		//$view->setLayout('list');
-		//echo $view->getLayout();
-		$view->setViewsDir(MODELS_PATH . $router->getModuleName() . '/Views/');
+		$view->setViewsDir(MODULES_PATH . $router->getModuleName() . '/Views/');
 		try {
 			$debug = new \Phalcon\Debug();
 			$debug->listen();
@@ -104,19 +92,15 @@ class Bootstrap extends Application{
 	}
 	protected function registerNamespaces(){
 		$loader = new \Phalcon\Loader();
-		$modules = ['content', 'admin', 'user'];
+		$modules = ['content', 'admin', 'users'];
 		foreach ($modules as $module) {
-			$nameSpaces[ucfirst($module)] = MODELS_PATH .$module;
+			$nameSpaces[ucfirst($module)] = MODULES_PATH .$module;
 		}
 		$loader->registerNamespaces($nameSpaces, true);
 		$loader->register();
 	}
-	protected function initErrorHandler()
-	{
+	protected function initErrorHandler(){
 		new ErrorHandler();
-	}
-	protected function initAcl(){
-		//(new Acl($this->di))->init();
 	}
 	public function initCache(){
 		$config = $this->di->getShared('config')->get('redis');
@@ -138,7 +122,7 @@ class Bootstrap extends Application{
 	}
 	protected function initResponse(){
 		$this->di->setShared('response',function () {
-			return new Response();
+			return new \Phalcon\Http\Response();
 		});
 	}
 
@@ -149,7 +133,7 @@ class Bootstrap extends Application{
 	}
 	protected function initRequest(){
 		$this->di->setShared('request',function () {
-			return new Request();
+			return new \Phalcon\Http\Request();
 		});
 	}
 	protected function initFlash(){
@@ -176,7 +160,7 @@ class Bootstrap extends Application{
 			return new modelsCache($config);
 		});
 	}
-	protected function initView($client = 'site'){
+	protected function initView(){
 		$this->di->setShared('url', function () {
 			return new \Phalcon\Mvc\Url();
 		});
