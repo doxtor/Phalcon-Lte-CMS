@@ -1,0 +1,17 @@
+<div class="container">
+<div class="row">
+	<div class="col-lg-8 col-md-10 mx-auto">
+	{% for item in paginator.items %}
+		<div class="post-preview">
+			<a href="post.html">
+				<h2 class="post-title">{{ item.title }}</h2>
+				<h3 class="post-subtitle">{{ item.descr }}</h3>
+			</a>
+			<p class="post-meta">Posted by <a href="#">{{ item.user_name }}</a> on {{ item.created_dt }}</p>
+		</div>
+		<hr>
+	{% endfor %}
+	{{ partial('pagination') }}
+	</div>
+</div>
+</div>

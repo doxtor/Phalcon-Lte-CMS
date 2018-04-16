@@ -1,9 +1,3 @@
-CREATE TABLE IF NOT EXISTS `logger` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `message` text NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Table for log';
-
 CREATE TABLE `acl` (
   `id` int(11) NOT NULL,
   `controller` char(15) NOT NULL,
@@ -26,23 +20,15 @@ INSERT INTO `modules` (`id`, `name`, `site`, `admin`, `title`) VALUES
 (2, 'content', '1', '1', 'Контент'),
 (3, 'users', '1', '1', 'Пользователи');
 
-CREATE TABLE `site` (
+CREATE TABLE `content` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'идентификатор',
-  `parent_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'идентификатор родителя из таблицы `site`',
-  `count_children` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'количество вложенных страниц',
-  `name1` varchar(100) NOT NULL DEFAULT '' COMMENT 'название',
-  `title_meta1` varchar(250) NOT NULL DEFAULT '' COMMENT 'заголовок окна в браузере, тег Title',
-  `keywords1` varchar(250) NOT NULL DEFAULT '' COMMENT 'ключевые слова, тег Keywords',
-  `descr1` text COMMENT 'описание, тэг Description',
-  `canonical1` varchar(100) NOT NULL DEFAULT '' COMMENT 'канонический тег',
-  `text1` longtext COMMENT 'контент',
-  `act1` enum('0','1') NOT NULL DEFAULT '0' COMMENT 'показывать на сайте: 0 - нет, 1 - да',
-  `access` enum('0','1') NOT NULL DEFAULT '0' COMMENT 'доступ ограничен: 0 - нет, 1 - да',
-  `date_start` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'дата начала показа',
-  `date_finish` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'дата окончания показа',
+  `name` varchar(100) NOT NULL DEFAULT '' COMMENT 'название',
+  `title_meta` varchar(250) NOT NULL DEFAULT '' COMMENT 'заголовок окна в браузере, тег Title',
+  `keywords` varchar(250) NOT NULL DEFAULT '' COMMENT 'ключевые слова, тег Keywords',
+  `descr` text COMMENT 'описание, тэг Description',
+  `canonical` varchar(100) NOT NULL DEFAULT '' COMMENT 'канонический тег',
+  `text` longtext COMMENT 'контент',
   `admin_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'пользователь из таблицы `users`, добавивший или первый отредктировавший страницу в административной части',
-  `title_no_show` enum('0','1') NOT NULL DEFAULT '0' COMMENT 'не копировать заголовок в H1: 0 - нет, 1 - да',
-  `map_no_show` enum('0','1') NOT NULL DEFAULT '0' COMMENT 'не показывать на карте сайта: 0 - нет, 1 - да',
   `changefreq` enum('always','hourly','daily','weekly','monthly','yearly','never') NOT NULL DEFAULT 'always' COMMENT 'Changefreq для sitemap.xml',
   `priority` varchar(3) NOT NULL DEFAULT '' COMMENT 'Priority для sitemap.xml',
   `noindex` enum('0','1') NOT NULL DEFAULT '0' COMMENT 'не индексировать: 0 - нет, 1 - да',
@@ -53,9 +39,8 @@ CREATE TABLE `site` (
   `module_name` varchar(50) NOT NULL DEFAULT '' COMMENT 'прикрепленный модуль',
   `js` text COMMENT 'JS-код',
   `trash` enum('0','1') NOT NULL DEFAULT '0' COMMENT 'запись удалена в корзину: 0 - нет, 1 - да',
-  PRIMARY KEY (`id`),
-  KEY `parent_id` (`parent_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=178 DEFAULT CHARSET=utf8 COMMENT='Страницы сайта';
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COMMENT='Страницы сайта';
 
 CREATE TABLE `users` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'идентификатор',
