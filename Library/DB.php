@@ -1,8 +1,7 @@
 <?php
 namespace Library;
 class DB extends \Phalcon\Db\Adapter\Pdo\Mysql{
-	public function __construct($config)
-	{
+	public function __construct($config){
 		$options = [
 			'host'     => $config->get('host'),
 			'username' => $config->get('username'),

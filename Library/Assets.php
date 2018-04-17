@@ -3,6 +3,7 @@ namespace Library;
 
 use Phalcon\Assets\Filters\{Cssmin, Jsmin};
 class Assets extends \Phalcon\Assets\Manager{
+	private $cache =  null;
 	public $collections = [
 		'header_css' => [
 			'path' => ASSETS_PATH . 'header.css',
@@ -26,9 +27,20 @@ class Assets extends \Phalcon\Assets\Manager{
 			],
 		],
 	];
-	private $cache =  null;
-	public function _setCache($cache){
-		$this->cache = $cache;
+	public function __construct($config){
+		parent::__construct();
+		$cacheFrontend = new \Phalcon\Cache\Frontend\Data([
+			'lifetime' => $config->get('lifetime'),
+		]);
+		$options = [
+			'host'       => $config->get('host'),
+			'port'       => $config->get('port'),
+			'persistent' => $config->get('persistent'),
+			'statsKey'   => $config->get('statsKey'),
+			'lifetime'   => $config->get('lifetime'),
+			'prefix'     => $config->get('prefix'),
+		];
+		$this->cache = new \Phalcon\Cache\Backend\Redis($cacheFrontend, $options);
 	}
 	public function _getIncludeAll(){
 		foreach ($this->collections as $collection => $files) {

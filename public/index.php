@@ -10,7 +10,8 @@ define('ADMIN_FOLDER', 'admin');
 		'Modules' => MODULES_PATH
 	], true)->register();
 try {
-	if (preg_match('/^\/'.ADMIN_FOLDER.'(\/|$)/', $_GET['_url'])){
+	if (isset($_GET['_url']) &&
+		preg_match('/^\/'.ADMIN_FOLDER.'(\/|$)/', $_GET['_url'])){
 		$app = new \Library\Admin();
 	}else{
 		$app = new \Library\Bootstrap();

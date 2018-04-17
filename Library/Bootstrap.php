@@ -31,17 +31,18 @@ class Bootstrap extends Application{
 	}
 	protected function dispatch(){
 		$router = $this->di->get('router');
-		$router->handle();
 		$view = $this->di->get('view');
 		$dispatcher = $this->di->get('dispatcher');
+		$response = $this->di->get('response');
+		$config = $this->di->get('config');
 
+		$router->handle();
 		$dispatcher->setModuleName($router->getModuleName());
 		$dispatcher->setControllerName($router->getControllerName());
 		$dispatcher->setActionName($router->getActionName());
 		$dispatcher->setParams($router->getParams());
 		$dispatcher->setDefaultNamespace('Modules\\'.ucfirst($router->getModuleName())."\Controller");
-		$response = $this->di->get('response');
-		$config = $this->di->get('config');
+
 		$view->setViewsDir(MODULES_PATH . ucfirst($router->getModuleName()) . '/Views/');
 		try {
 			$debug = new \Phalcon\Debug();
@@ -50,7 +51,7 @@ class Bootstrap extends Application{
 		} catch (\Phalcon\Exception $e) {
 			$view->start();
 			$view->setPartialsDir('');
-			$view->setViewsDir(BASE_PATH . '/views/');
+			$view->setViewsDir(BASE_PATH . '/Views/');
 
 			if ($e instanceof \Phalcon\Mvc\Dispatcher\Exception) {
 				$view->e = $e;
@@ -75,12 +76,10 @@ class Bootstrap extends Application{
 		}
 		return $response;
 	}
-	protected function initLoader()
-	{
+	protected function initLoader(){
 		require BASE_PATH . '/vendor/autoload.php';
 	}
-	protected function initConfig()
-	{
+	protected function initConfig(){
 		$this->di->set('config', function (){
 			return include BASE_PATH . "/config.php";
 		});
@@ -91,14 +90,12 @@ class Bootstrap extends Application{
 			return new Cache($config);
 		});
 	}
-	protected function initRouter()
-	{
+	protected function initRouter(){
 		$this->di->setShared('router', function () {
 			return new Router();
 		});
 	}
-	protected function initLogger()
-	{
+	protected function initLogger(){
 		$this->di->setShared('logger', function () {
 			return new Logger();
 		});
@@ -108,7 +105,6 @@ class Bootstrap extends Application{
 			return new \Phalcon\Http\Response();
 		});
 	}
-
 	protected function initDispatcher(){
 		$this->di->setShared('dispatcher', function() {
 			return new Dispatcher();
@@ -144,14 +140,8 @@ class Bootstrap extends Application{
 		});
 	}
 	protected function initView(){
-		$this->di->setShared('url', function () {
-			return new \Phalcon\Mvc\Url();
-		});
 		$this->di->setShared('tag', function () {
-			return new \Phalcon\Tag();
-		});
-		$this->di->setShared('escaper', function () {
-			return new \Phalcon\Escaper();
+			return new Tag();
 		});
 		$this->di->setShared('view', function () {
 			return new View();
@@ -165,8 +155,7 @@ class Bootstrap extends Application{
 	{
 		$cache = $this->di->getShared('cache');
 		$this->di->setShared('assets', function () use ($cache) {
-			$assets = new Assets();
-			$assets->_setCache($cache);
+			$assets = new Assets($cache);
 			$assets->_getCache();
 			return $assets;
 		});

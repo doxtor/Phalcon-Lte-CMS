@@ -3,5 +3,5 @@
 	<a href='/robots/search?page={{ paginator.before }}'>Previous</a>
 	<a href='/robots/search?page={{ paginator.next }}'>Next</a>
 	<a href='/robots/search?page={{ paginator.last }}'>Last</a>
-	You are in page {{ paginator.current }} of {{ page.total_pages }}
+	You are in page {{ paginator.current }} of 
 </div>

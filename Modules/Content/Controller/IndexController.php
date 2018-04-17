@@ -1,9 +1,7 @@
 <?php
 namespace Modules\Content\Controller;
-use Modules\Content\Model\Content;
 use Phalcon\Paginator\Adapter\QueryBuilder as PaginatorQueryBuilder;
-class IndexController extends \Library\Controller
-{
+class IndexController extends \Library\Controller{
 	public function indexAction(){
 		$this->tag->setTitle('Clean Blog - A Blog Theme by Start Bootstrap');
 		$builder = $this->modelsManager->createBuilder()

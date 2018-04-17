@@ -1,14 +1,13 @@
 <?php
 namespace Library;
 class Session extends \Phalcon\Session\Adapter\Redis{
-	public function __construct($config)
-	{
+	public function __construct($config){
 		$options = [
-			'host'       => $config->get('host', 'localhost'),
-			'port'       => $config->get('port', '6379'),
-			'persistent' => $config->get('persistent', '_PHCM_'),
-			'lifetime'   => $config->get('lifetime', '18600'),
-			'prefix'     => $config->get('prefix', '-cms-'),
+			'host'       => $config->get('host'),
+			'port'       => $config->get('port'),
+			'persistent' => $config->get('persistent'),
+			'lifetime'   => $config->get('lifetime'),
+			'prefix'     => $config->get('prefix'),
 		];
 		parent::__construct($options);
 		$this->start();

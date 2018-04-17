@@ -7,54 +7,7 @@ class AdminController extends Controller{
 	public $variables;
 	public $list;
 	public $builder;
-
-	/*public function indexAction(){
-		if($this->request->isAjax()){
-			$draw = (int) $this->request->getPost('draw');
-			$start = (int) $this->request->getPost('start');
-			$limit = (int) $this->request->getPost('length');
-
-			if(!$limit) return;
-			$currentPage = $limit ? ($start + $limit)/$limit : 1;
-			$modelClass = $this->table;
-			$primaryKeyName = $modelClass::PRIMARY_KEY;
-
-			$columns = [];
-			foreach ($this->list as $key => $value) {
-				if(isset($value['sql']) && $value['sql']){
-					$columns[] = $key;
-				}
-			}
-			$qb = $this->modelsManager->createBuilder()
-				->columns($columns)
-				->addFrom($this->table);
-
-			$this->builder = $this->modelsManager->createBuilder()->columns($columns);
-			$this->builder->addFrom($this->table, 'e');
-
-			$page = (new PaginatorQueryBuilder([
-					'builder' => $this->builder,
-					'limit' => $limit,
-					'page'  => $currentPage,
-				]))->getPaginate();
-			$data = [
-					'draw' => $draw,
-					'recordsTotal' => $page->total_items,
-					'recordsFiltered' => $page->total_items
-				];
-			$i = 0; $data['data'] = [];
-			foreach ($page->items as $item) {
-				$data['data'][$i][] = $item->id;
-				$data['data'][$i][] = $item->name;
-				$i++;
-			}
-			$this->response->setContentType('application/json', 'UTF-8');
-			$this->response->setJsonContent($data);
-		}else{
-			parent::setTitle($this->getModuleTitle());
-			$this->view->setLayout('list');
-		}
-	}*/
+	
 	public function editAction($primaryKeyValue = null){
 		$modelClass = $this->table;
 		$primaryKeyName = $modelClass::PRIMARY_KEY;

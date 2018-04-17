@@ -1,11 +1,3 @@
-CREATE TABLE `acl` (
-  `id` int(11) NOT NULL,
-  `controller` char(15) NOT NULL,
-  `action` char(15) NOT NULL,
-  PRIMARY KEY (`id`,`controller`,`action`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COMMENT='Table for ACL';
-
-
 CREATE TABLE `modules` (
   `id` smallint(5) unsigned NOT NULL AUTO_INCREMENT COMMENT 'идентификатор',
   `name` varchar(30) NOT NULL DEFAULT '' COMMENT 'название',
@@ -16,9 +8,10 @@ CREATE TABLE `modules` (
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COMMENT='Модули';
 
 INSERT INTO `modules` (`id`, `name`, `site`, `admin`, `title`) VALUES
-(1, 'admin', '0', '1', 'Админ'),
-(2, 'content', '1', '1', 'Контент'),
-(3, 'users', '1', '1', 'Пользователи');
+(1, 'site', '1', '0', 'Страницы'),
+(2, 'admin', '0', '1', 'Админ'),
+(3, 'content', '1', '1', 'Контент'),
+(4, 'users', '1', '1', 'Пользователи');
 
 CREATE TABLE `content` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'идентификатор',
@@ -63,4 +56,18 @@ CREATE TABLE `users` (
   `trash` enum('0','1') NOT NULL DEFAULT '0' COMMENT 'запись удалена в корзину: 0 - нет, 1 - да',
   PRIMARY KEY (`id`),
   KEY `name` (`name`(1))
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8 COMMENT='Пользователи';
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COMMENT='Пользователи';
+
+CREATE TABLE `site` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `name` varchar(100) NOT NULL DEFAULT '',
+  `module` varchar(100) DEFAULT NULL,
+  `controller` varchar(100) DEFAULT NULL,
+  `action` varchar(100) DEFAULT NULL,
+  `params` varchar(100) DEFAULT NULL,
+  `text` text NOT NULL,
+  `description` varchar(250) NOT NULL DEFAULT '',
+  `keywords` varchar(250) NOT NULL DEFAULT '',
+  `trash` enum('0','1') NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8
