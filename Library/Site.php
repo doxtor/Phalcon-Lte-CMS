@@ -1,6 +1,6 @@
 <?php
 namespace Library;
-class Admin extends Bootstrap{
+class Site extends Bootstrap{
 	public $di = null;
 	public function run(){
 		$this->di = new \Phalcon\Di\FactoryDefault();
@@ -9,7 +9,7 @@ class Admin extends Bootstrap{
 		$this->initConfig();
 		$this->initCache();
 		$this->initRouter([
-			'module' => 'admin',
+			'module' => 'site',
 			'controller' => 'index',
 			'action' => 'index',
 		]);
@@ -25,24 +25,25 @@ class Admin extends Bootstrap{
 		$response->send();
 	}
 	protected function initFolders(){
-		define('VIEWS_PATH', BASE_PATH . '/Views/admin/');
+		define('VIEWS_PATH', BASE_PATH . '/Views/site/');
 		define('CACHE_PATH', BASE_PATH . '/cache/');
 		define('ASSETS_PATH', BASE_PATH . '/public/assets/');
 		define('ASSETS_URL', 'assets/');
 	}
 	protected function dispatch(){
 		$router = $this->di->get('router');
-		$router->handle();
 		$view = $this->di->get('view');
 		$dispatcher = $this->di->get('dispatcher');
+		$response = $this->di->get('response');
+		$config = $this->di->get('config');
 
+		$router->handle();
 		$dispatcher->setModuleName($router->getModuleName());
 		$dispatcher->setControllerName($router->getControllerName());
 		$dispatcher->setActionName($router->getActionName());
 		$dispatcher->setParams($router->getParams());
-		$dispatcher->setDefaultNamespace('Modules\\' . ucfirst($router->getModuleName())."\Admin");
-		$response = $this->di->get('response');
-		$config = $this->di->get('config');
+		$dispatcher->setDefaultNamespace('Modules\\'.ucfirst($router->getModuleName())."\Controller");
+
 		$view->setViewsDir(MODULES_PATH . ucfirst($router->getModuleName()) . '/Views/');
 		try {
 			$debug = new \Phalcon\Debug();
@@ -51,7 +52,7 @@ class Admin extends Bootstrap{
 		} catch (\Phalcon\Exception $e) {
 			$view->start();
 			$view->setPartialsDir('');
-			$view->setViewsDir(BASE_PATH . '/views/');
+			$view->setViewsDir(BASE_PATH . '/Views/');
 
 			if ($e instanceof \Phalcon\Mvc\Dispatcher\Exception) {
 				$view->e = $e;

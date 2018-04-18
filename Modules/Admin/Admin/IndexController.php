@@ -14,26 +14,7 @@ class IndexController extends \Library\AdminController
 			if(!$limit) return;
 			$currentPage = $limit ? ($start + $limit)/$limit : 1;
 
-			$builder = $this->modelsManager->createBuilder()->columns('*');
-			$builder->addFrom('Modules\Users\Model\Users');
-
-			/*$search = $this->request->getPost('search');
-			$search = $search['value'];
-			if($search){
-				$builder->orWhere('bl.phone LIKE "%'.$search.'%"');
-				$builder->orWhere('bl.comment LIKE "%'.$search.'%"');
-				$builder->orWhere('bl.hall_id = '.(int)$search);
-			}
-
-			$order = $this->request->getPost('order');
-			$order = $order[0];
-			switch($order['column']){
-				default:case 0:$builder->orderBy('bl.added_at '.$order['dir']);break;
-				case 1:$builder->orderBy('bl.phone '.$order['dir']);break;
-				case 2:$builder->orderBy('bl.comment '.$order['dir']);break;
-				case 3:$builder->orderBy('bl.hall_id '.$order['dir']);break;
-			}*/
-
+			$builder = $this->modelsManager->createBuilder()->addFrom('Modules\Users\Model\Users');
 			$page = (new PaginatorQueryBuilder([
 					'builder' => $builder,
 					'limit' => $limit,

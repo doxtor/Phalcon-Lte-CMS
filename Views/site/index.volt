@@ -9,7 +9,7 @@
 	<link href="favicon.ico" rel="shortcut icon" type="image/png"/>
 	{{ get_title() }}
 	<link href="/css/bootstrap.css" rel="stylesheet">
-	<link href="css/clean-blog.css" rel="stylesheet">
+	<link href="/css/clean-blog.css" rel="stylesheet">
 </head>
 <body>
 	{{ partial('menu') }}

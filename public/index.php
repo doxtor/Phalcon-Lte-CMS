@@ -14,7 +14,7 @@ try {
 		preg_match('/^\/'.ADMIN_FOLDER.'(\/|$)/', $_GET['_url'])){
 		$app = new \Library\Admin();
 	}else{
-		$app = new \Library\Bootstrap();
+		$app = new \Library\Site();
 	}
 	echo $app->run();
 } catch (\Exception $e) {

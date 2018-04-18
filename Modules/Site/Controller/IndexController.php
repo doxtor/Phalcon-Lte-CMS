@@ -10,7 +10,7 @@ class IndexController extends \Library\Controller
 			'bind' => [1 => $id],
 		]);
 
-		if($site->module){
+		if(isset($site->module)){
 			$this->tag->setDescription($site->description);
 			$this->tag->setKeywords($site->keywords);
 			return $this->forward([

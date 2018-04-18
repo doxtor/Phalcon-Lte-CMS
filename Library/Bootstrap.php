@@ -22,13 +22,6 @@ class Bootstrap extends Application{
 		$response = $this->dispatch();
 		$response->send();
 	}
-	protected function initFolders()
-	{
-		define('VIEWS_PATH', BASE_PATH . '/Views/site/');
-		define('CACHE_PATH', BASE_PATH . '/cache/');
-		define('ASSETS_PATH', BASE_PATH . '/public/assets/');
-		define('ASSETS_URL', 'assets/');
-	}
 	protected function dispatch(){
 		$router = $this->di->get('router');
 		$view = $this->di->get('view');
@@ -81,7 +74,7 @@ class Bootstrap extends Application{
 	}
 	protected function initConfig(){
 		$this->di->set('config', function (){
-			return include BASE_PATH . "/config.php";
+			return include BASE_PATH . "/config/config.php";
 		});
 	}
 	public function initCache(){
@@ -90,14 +83,9 @@ class Bootstrap extends Application{
 			return new Cache($config);
 		});
 	}
-	protected function initRouter(){
-		$this->di->setShared('router', function () {
-			return new Router();
-		});
-	}
-	protected function initLogger(){
-		$this->di->setShared('logger', function () {
-			return new Logger();
+	protected function initRouter($config){
+		$this->di->setShared('router', function () use($config) {
+			return new Router($config);
 		});
 	}
 	protected function initResponse(){
@@ -153,9 +141,9 @@ class Bootstrap extends Application{
 	}
 	protected function initAssets()
 	{
-		$cache = $this->di->getShared('cache');
-		$this->di->setShared('assets', function () use ($cache) {
-			$assets = new Assets($cache);
+		$config = $this->di->getShared('config')->get('redis');
+		$this->di->setShared('assets', function () use ($config) {
+			$assets = new Assets($config);
 			$assets->_getCache();
 			return $assets;
 		});

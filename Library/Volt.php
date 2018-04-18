@@ -7,6 +7,7 @@ class Volt extends \Phalcon\Mvc\View\Engine\Volt{
 			'compiledPath'      => CACHE_PATH,
 			'compiledSeparator' => '_',
 			'compiledExtension' => '.php',
+			'compileAlways'     => false,
 		]);
 		$compiler = $this->getCompiler();
 		$compiler->addFunction('get_description', '$this->tag->getDescription');
