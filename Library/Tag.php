@@ -3,6 +3,7 @@ namespace Library;
 class Tag extends \Phalcon\Tag {
 	static public $description;
 	static public $keywords = [];
+	static public $bg_image = null;
 	public function setDescription($descr) {
 		self::$description = $descr;
 	}
@@ -15,4 +16,11 @@ class Tag extends \Phalcon\Tag {
 	public function getKeywords(){
 		return implode(', ',self::$keywords);
 	}
+	public function setBackground($bg_image){
+		self::$bg_image = $bg_image;
+	}
+	public function getBackground(){
+		return self::$bg_image;
+	}
+
 }

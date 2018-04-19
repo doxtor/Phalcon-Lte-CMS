@@ -35,8 +35,7 @@ class Admin extends Bootstrap{
 		$view = $this->di->get('view');
 		$dispatcher = $this->di->get('dispatcher');
 		$response = $this->di->get('response');
-		$config = $this->di->get('config');
-		//$dispatcher->setControllerSuffix('Admin');
+		$dispatcher->setControllerSuffix('Admin');
 		//$dispatcher->setActionSuffix('');
 		$dispatcher->setControllerName($router->getControllerName());
 		$dispatcher->setActionName($router->getActionName());
@@ -44,6 +43,7 @@ class Admin extends Bootstrap{
 		$module = ucfirst(str_replace('admin', '', $router->getControllerName()));
 		$dispatcher->setDefaultNamespace('Modules\\' . $module);
 		$view->setViewsDir(MODULES_PATH . $module);
+		$view->pick(MODULES_PATH . ucfirst($router->getControllerName()) . '/view/admin.' . $router->getActionName());
 		try {
 			$debug = new \Phalcon\Debug();
 			$debug->listen();

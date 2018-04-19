@@ -142,17 +142,4 @@ class AdminController extends Controller{
 		$this->view->variables = $this->variables;
 		$this->view->setLayout('edit');
 	}
-	public function getModuleTitle($module = null){
-		if($module === null){
-			$module = $this->router->getModuleName();
-		}
-		if(!$title = $this->cache->get('modules\title\\'.$module)){
-			$result = \Library\Model\Modules::findFirst([
-				'name = :name:',
-				'bind' => ['name' => $module]
-			]);
-			$this->cache->save('modules\title\\'.$module, $result->title);
-		}
-		return $title;
-	}
 }

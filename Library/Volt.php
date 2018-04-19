@@ -12,5 +12,7 @@ class Volt extends \Phalcon\Mvc\View\Engine\Volt{
 		$compiler = $this->getCompiler();
 		$compiler->addFunction('get_description', '$this->tag->getDescription');
 		$compiler->addFunction('get_keywords', '$this->tag->getKeywords');
+		$compiler->addFunction('get_background', '$this->tag->getBackground');
+
 	}
 }

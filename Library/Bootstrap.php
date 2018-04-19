@@ -8,7 +8,7 @@ class Bootstrap extends Application{
 	}
 	protected function initConfig(){
 		$this->di->set('config', function (){
-			return include BASE_PATH . "/config/config.php";
+			return include BASE_PATH . '/config.php';
 		});
 	}
 	public function initCache(){
@@ -81,13 +81,10 @@ class Bootstrap extends Application{
 			return new Volt($view, $di);
 		});
 	}
-	protected function initAssets()
-	{
+	protected function initAssets(){
 		$config = $this->di->getShared('config')->get('redis');
 		$this->di->setShared('assets', function () use ($config) {
-			$assets = new Assets($config);
-			$assets->_getCache();
-			return $assets;
+			return new Assets($config);
 		});
 	}
 }

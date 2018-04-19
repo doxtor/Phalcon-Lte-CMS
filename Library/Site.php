@@ -31,11 +31,9 @@ class Site extends Bootstrap{
 		define('ASSETS_URL', 'assets/');
 	}
 	protected function dispatch(){
-		$router = $this->di->get('router');
 		$view = $this->di->get('view');
 		$dispatcher = $this->di->get('dispatcher');
 		$response = $this->di->get('response');
-		$config = $this->di->get('config');
 		$router = $this->di->getShared('router');
 		$modules = $this->di->getShared('modules');
 		foreach ($modules as $module) {

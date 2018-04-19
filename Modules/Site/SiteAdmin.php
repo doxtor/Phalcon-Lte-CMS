@@ -1,10 +1,8 @@
 <?php
 namespace Modules\Site;
 use Phalcon\Paginator\Adapter\QueryBuilder as PaginatorQueryBuilder;
-class SiteAdmin extends \Library\AdminController
-{
-	public function index()
-	{
+class SiteAdmin extends \Library\AdminController{
+	public function indexAction(){
 		if($this->request->isAjax()){
 			$limit = $this->request->getPost('length', 'int');
 			$page = $limit ? ($this->request->getPost('start', 'int') + $limit)/$limit : 1;

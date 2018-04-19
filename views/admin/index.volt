@@ -7,9 +7,8 @@
 	<meta name="author" content="Daniiar Nurmanbetov">
 	<link href="/favicon.ico" rel="shortcut icon" type="image/png"/>
 	{{ get_title() }}
-	{{ assets.outputCss('header_css') }}
+	{{ assets.outputCss('header_admin') }}
 	{{ assets.outputCss() }}
-	<link rel="stylesheet" type="text/css" href="/css/admin.css" />
 </head>
 <body>
 	<div class="container-fluid h-100">
@@ -21,7 +20,7 @@
 			</main>
 		</div>
 	</div>
-	{{ assets.outputJs('footer_js') }}
+	{{ assets.outputJs('footer_admin') }}
 	{% do assets.addJs('js/list.js') %}
 	{{ assets.outputJs() }}
 </body>
