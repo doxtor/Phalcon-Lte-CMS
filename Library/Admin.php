@@ -9,6 +9,7 @@ class Admin extends Bootstrap{
 		$this->initConfig();
 		$this->initCache();
 		$this->initRouter([
+			'module' => 'site',
 			'controller' => 'site',
 			'action' => 'index',
 		]);
@@ -36,14 +37,18 @@ class Admin extends Bootstrap{
 		$dispatcher = $this->di->get('dispatcher');
 		$response = $this->di->get('response');
 		$dispatcher->setControllerSuffix('Admin');
-		//$dispatcher->setActionSuffix('');
+		$dispatcher->setModuleName($router->getModuleName());
 		$dispatcher->setControllerName($router->getControllerName());
 		$dispatcher->setActionName($router->getActionName());
 		$dispatcher->setParams($router->getParams());
 		$module = ucfirst(str_replace('admin', '', $router->getControllerName()));
 		$dispatcher->setDefaultNamespace('Modules\\' . $module);
 		$view->setViewsDir(MODULES_PATH . $module);
-		$view->pick(MODULES_PATH . ucfirst($router->getControllerName()) . '/view/admin.' . $router->getActionName());
+		$view->pick(MODULES_PATH
+			. ucfirst($router->getControllerName())
+			. '/view/admin.'
+			. $router->getModuleName()
+			. '.' . $router->getActionName());
 		try {
 			$debug = new \Phalcon\Debug();
 			$debug->listen();

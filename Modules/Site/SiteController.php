@@ -15,6 +15,7 @@ class SiteController extends \Library\Controller{
 			$this->tag->setDescription($site->description);
 			$this->tag->setKeywords($site->keywords);
 			return $this->forward([
+				'module' => $site->module,
 				'controller' => $site->controller,
 				'action' => $site->action,
 				'params' => json_decode($site->params),

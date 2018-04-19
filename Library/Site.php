@@ -9,6 +9,7 @@ class Site extends Bootstrap{
 		$this->initConfig();
 		$this->initCache();
 		$this->initRouter([
+			'module' => 'site',
 			'controller' => 'site',
 			'action' => 'index',
 		]);
@@ -44,13 +45,17 @@ class Site extends Bootstrap{
 		}
 
 		$router->handle();
+		$dispatcher->setModuleName($router->getModuleName());
 		$dispatcher->setControllerName($router->getControllerName());
 		$dispatcher->setActionName($router->getActionName());
 		$dispatcher->setParams($router->getParams());
-		$dispatcher->setDefaultNamespace('Modules\\'.ucfirst($router->getControllerName()));
+		$dispatcher->setDefaultNamespace('Modules\\'.ucfirst($router->getModuleName()));
 
-		$view->setViewsDir(MODULES_PATH . ucfirst($router->getControllerName()));
-		$view->pick(MODULES_PATH . ucfirst($router->getControllerName()) . '/view/site.' . $router->getActionName());
+		$view->setViewsDir(MODULES_PATH . ucfirst($router->getModuleName()));
+		$view->pick(MODULES_PATH
+			. ucfirst($router->getControllerName())
+			. '/view/site.' . $router->getModuleName()
+			. '.' . $router->getActionName());
 		try {
 			$debug = new \Phalcon\Debug();
 			$debug->listen();
