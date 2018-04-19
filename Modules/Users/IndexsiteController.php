@@ -1,6 +1,6 @@
 <?php
 namespace Modules\Users\Controller;
-class IndexController extends \Library\Controller{
+class IndexsiteController extends \Library\Controller{
 	public function indexAction(){
 		$this->tag->setTitle('Test');
 	}

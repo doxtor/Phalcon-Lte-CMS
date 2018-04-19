@@ -1,35 +1,31 @@
 <?php
-namespace Modules\Admin\Admin;
+namespace Modules\Site;
 use Phalcon\Paginator\Adapter\QueryBuilder as PaginatorQueryBuilder;
-use Model\Logger;
-class IndexController extends \Library\AdminController
+class SiteAdmin extends \Library\AdminController
 {
-	public function indexAction()
+	public function index()
 	{
 		if($this->request->isAjax()){
-			$draw = (int) $this->request->getPost('draw');
-			$start = (int) $this->request->getPost('start');
-			$limit = (int) $this->request->getPost('length');
-
-			if(!$limit) return;
-			$currentPage = $limit ? ($start + $limit)/$limit : 1;
+			$limit = $this->request->getPost('length', 'int');
+			$page = $limit ? ($this->request->getPost('start', 'int') + $limit)/$limit : 1;
 
 			$builder = $this->modelsManager->createBuilder()->addFrom('Modules\Users\Model\Users');
-			$page = (new PaginatorQueryBuilder([
+			$paginator = (new PaginatorQueryBuilder([
 					'builder' => $builder,
 					'limit' => $limit,
-					'page'  => $currentPage,
+					'page'  => $page,
 				]))->getPaginate();
 			$data = [
-					'draw' => $draw,
-					'recordsTotal' => $page->total_items,
-					'recordsFiltered' => $page->total_items
+					'data' => [],
+					'draw' => $this->request->getPost('draw', 'int'),
+					'recordsTotal' => $paginator->total_items,
+					'recordsFiltered' => $paginator->total_items
 				];
-			$i = 0; $data['data'] = [];
-			foreach ($page->items as $item) {
+			$i = 0;
+			foreach ($paginator->items as $item) {
 				$data['data'][$i][] = $item->id;
 				$data['data'][$i][] = $item->name;
-				$data['data'][$i][] = '<a href="/black/delete/'.$item->id.'"'
+				$data['data'][$i][] = '<a href="/black/delete/' . $item->id . '"'
 					. 'title="Удалить" onclick="return confirm(\'Вы уверены?\');" class="btn btn-default">'
 					. '<i class="fa fa-trash"></i></a>';
 				$i++;

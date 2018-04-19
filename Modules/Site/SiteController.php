@@ -1,8 +1,8 @@
 <?php
-namespace Modules\Site\Controller;
+namespace Modules\Site;
 use Modules\Site\Model\Site;
 use Phalcon\Paginator\Adapter\QueryBuilder as PaginatorQueryBuilder;
-class IndexController extends \Library\Controller
+class SiteController extends \Library\Controller
 {
 	public function indexAction($id = 1){
 		$site = Site::findFirst([
@@ -14,10 +14,9 @@ class IndexController extends \Library\Controller
 			$this->tag->setDescription($site->description);
 			$this->tag->setKeywords($site->keywords);
 			return $this->forward([
-				'module' => $site->module,
 				'controller' => $site->controller,
 				'action' => $site->action,
-				'params' => [],
+				'params' => json_decode($site->params),
 			]);
 		}else{
 

@@ -9,8 +9,7 @@ class Admin extends Bootstrap{
 		$this->initConfig();
 		$this->initCache();
 		$this->initRouter([
-			'module' => 'admin',
-			'controller' => 'index',
+			'controller' => 'site',
 			'action' => 'index',
 		]);
 		$this->initResponse();
@@ -25,7 +24,7 @@ class Admin extends Bootstrap{
 		$response->send();
 	}
 	protected function initFolders(){
-		define('VIEWS_PATH', BASE_PATH . '/Views/admin/');
+		define('VIEWS_PATH', BASE_PATH . '/views/admin');
 		define('CACHE_PATH', BASE_PATH . '/cache/');
 		define('ASSETS_PATH', BASE_PATH . '/public/assets/');
 		define('ASSETS_URL', 'assets/');
@@ -35,15 +34,16 @@ class Admin extends Bootstrap{
 		$router->handle();
 		$view = $this->di->get('view');
 		$dispatcher = $this->di->get('dispatcher');
-
-		$dispatcher->setModuleName($router->getModuleName());
+		$response = $this->di->get('response');
+		$config = $this->di->get('config');
+		//$dispatcher->setControllerSuffix('Admin');
+		//$dispatcher->setActionSuffix('');
 		$dispatcher->setControllerName($router->getControllerName());
 		$dispatcher->setActionName($router->getActionName());
 		$dispatcher->setParams($router->getParams());
-		$dispatcher->setDefaultNamespace('Modules\\' . ucfirst($router->getModuleName())."\Admin");
-		$response = $this->di->get('response');
-		$config = $this->di->get('config');
-		$view->setViewsDir(MODULES_PATH . ucfirst($router->getModuleName()) . '/Views/');
+		$module = ucfirst(str_replace('admin', '', $router->getControllerName()));
+		$dispatcher->setDefaultNamespace('Modules\\' . $module);
+		$view->setViewsDir(MODULES_PATH . $module);
 		try {
 			$debug = new \Phalcon\Debug();
 			$debug->listen();
@@ -56,10 +56,10 @@ class Admin extends Bootstrap{
 			if ($e instanceof \Phalcon\Mvc\Dispatcher\Exception) {
 				$view->e = $e;
 				$response->setStatusCode(404, 'Not Found');
-				$view->partial(BASE_PATH . '/Views/error/show404');
+				$view->partial(BASE_PATH . '/views/error/show404');
 			} else {
 				$response->setStatusCode(503, 'Service Unavailable');
-				$view->partial(BASE_PATH . '/Views/error/show503');
+				$view->partial(BASE_PATH . '/views/error/show503');
 			}
 			return $response;
 		}

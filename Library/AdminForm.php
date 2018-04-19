@@ -1,6 +1,6 @@
 <?php
 namespace Library;
-class AdminForm extends Phalcon\Forms\Form{
+class AdminForm extends Form{
 	public function initialize($variables = null, $value = null) {
 		if ($variables === null) return;
 		foreach ($variables as $groups) {

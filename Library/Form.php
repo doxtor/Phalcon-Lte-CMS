@@ -1,3 +1,3 @@
 <?php
 namespace Library;
-class UsersForm extends \Phalcon\Forms\Form{}
+class Form extends \Phalcon\Forms\Form{}

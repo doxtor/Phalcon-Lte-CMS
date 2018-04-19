@@ -1,22 +1,14 @@
 <?php
-define('BASE_PATH', dirname(__FILE__));
-(new \Phalcon\Loader())
-	->registerNamespaces(['Library' => BASE_PATH . '/library/'], true)
-	->register();
-
-class Cli extends \Library\Bootstrap
-{
+namespace Library;
+class Cli extends \Library\Bootstrap{
 	public function _run($argv)
 	{
 		$this->di = new \Phalcon\Di\FactoryDefault\Cli();
 		$this->initLoader();
 		$this->initConfig();
-		$this->registerDirs();
-		$this->registerNamespaces();
+		$this->initFolders();
 		$this->initCache();
 		$this->initDB();
-		$this->initLogger();
-		$this->initErrorHandler();
 		$console = new \Phalcon\Cli\Console();
 		$console->setDI($this->di);
 		$arguments = [];
@@ -36,11 +28,10 @@ class Cli extends \Library\Bootstrap
 			echo $e->getMessage();
 		}
 	}
-	protected function registerDirs()
-	{
-		$loader = new \Phalcon\Loader();
-		$loader->registerDirs([BASE_PATH . '/tasks/']);
-		$loader->register();
+	protected function initFolders(){
+		define('VIEWS_PATH', BASE_PATH . '/Views/site/');
+		define('CACHE_PATH', BASE_PATH . '/cache/');
+		define('ASSETS_PATH', BASE_PATH . '/public/assets/');
+		define('ASSETS_URL', 'assets/');
 	}
 }
-(new Cli())->_run($argv);

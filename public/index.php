@@ -3,7 +3,6 @@ define('BASE_PATH', realpath('..'));
 define('LIBRARY_PATH', BASE_PATH . '/Library/');
 define('MODULES_PATH', BASE_PATH . '/Modules/');
 define('ADMIN_FOLDER', 'admin');
-
 (new \Phalcon\Loader())
 	->registerNamespaces([
 		'Library' => LIBRARY_PATH,
@@ -13,6 +12,9 @@ try {
 	if (isset($_GET['_url']) &&
 		preg_match('/^\/'.ADMIN_FOLDER.'(\/|$)/', $_GET['_url'])){
 		$app = new \Library\Admin();
+	}elseif(php_sapi_name() === 'cli'){
+		(new \Library\Cli())->_run($argv);
+		exit;
 	}else{
 		$app = new \Library\Site();
 	}
