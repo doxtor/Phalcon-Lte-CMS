@@ -22,5 +22,4 @@ class Tag extends \Phalcon\Tag {
 	public function getBackground(){
 		return self::$bg_image;
 	}
-
 }

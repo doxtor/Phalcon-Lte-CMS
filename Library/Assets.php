@@ -29,7 +29,22 @@ class Assets extends \Phalcon\Assets\Manager{
 					$collection->addJs($files['uri'] . '?r=' . $rand);
 				}
 			}elseif(isset($files['path']) && !file_exists($files['path'])){
-				$this->gen($collection_name, $files);
+				$collection = $this->collection($collection_name);
+				$collection->setLocal(true);
+				if($files['type'] === 'css' && count($files['files'])){
+					$collection->addFilter(new Cssmin());
+					foreach ($files['files'] as $file) {
+						$collection->addCss($file);
+					}
+				}elseif(count($files['files'])){
+					$collection->addFilter(new Jsmin());
+					foreach ($files['files'] as $file) {
+						$collection->addJs($file);
+					}
+				}
+				$collection->setTargetPath($files['path']);
+				$collection->setTargetUri($files['uri']);
+				$collection->join(true);
 			}elseif(isset($files['files'])){
 				$rand = filemtime($files['path']);
 				$this->cache->save('assets.' . $collection_name, $rand);
@@ -43,23 +58,5 @@ class Assets extends \Phalcon\Assets\Manager{
 				$this->collection($collection_name);
 			}
 		}
-	}
-	private function gen($collection_name, $files){
-		$collection = $this->collection($collection_name);
-		$collection->setLocal(true);
-		if($files['type'] === 'css' && count($files['files'])){
-			$collection->addFilter(new Cssmin());
-			foreach ($files['files'] as $file) {
-				$collection->addCss($file);
-			}
-		}elseif(count($files['files'])){
-			$collection->addFilter(new Jsmin());
-			foreach ($files['files'] as $file) {
-				$collection->addJs($file);
-			}
-		}
-		$collection->setTargetPath($files['path']);
-		$collection->setTargetUri($files['uri']);
-		$collection->join(true);
 	}
 }

@@ -63,10 +63,10 @@ class Bootstrap extends Application{
 		});
 		$config = $this->di->getShared('config')->get('redis');
 		$this->di->setShared('modelsMetadata', function() use ($config){
-			return new modelsMetadata($config);
+			return new ModelsMetadata($config);
 		});
 		$this->di->setShared('modelsCache', function() use ($config){
-			return new modelsCache($config);
+			return new ModelsCache($config);
 		});
 	}
 	protected function initView(){
