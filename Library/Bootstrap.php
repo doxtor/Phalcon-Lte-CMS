@@ -76,7 +76,6 @@ class Bootstrap extends Application{
 		$this->di->setShared('view', function () {
 			return new View();
 		});
-		$view = $this->di->get('view'); $di = $this->di;
 		$this->di->setShared('volt', function ($view, $di) {
 			return new Volt($view, $di);
 		});

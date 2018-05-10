@@ -49,11 +49,12 @@ class Site extends Bootstrap{
 		$dispatcher->setControllerName($router->getControllerName());
 		$dispatcher->setActionName($router->getActionName());
 		$dispatcher->setParams($router->getParams());
-		$dispatcher->setDefaultNamespace('Modules\\'.ucfirst($router->getModuleName()));
+		$module = ucfirst($router->getModuleName());
+		$dispatcher->setDefaultNamespace('Modules\\' . $module);
 
-		$view->setViewsDir(MODULES_PATH . ucfirst($router->getModuleName()));
+		$view->setViewsDir(MODULES_PATH . $module);
 		$view->pick(MODULES_PATH
-			. ucfirst($router->getControllerName())
+			. $module
 			. '/view/site.' . $router->getModuleName()
 			. '.' . $router->getActionName());
 		try {
