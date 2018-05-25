@@ -5,15 +5,17 @@ class Controller extends \Phalcon\Mvc\Controller{
 		$this->tag->setTitle($title);
 	}
 	public function forward($param){
+		$this->dispatcher->setModuleName($param['module']);
 		$this->view->pick(MODULES_PATH
 			. ucfirst($param['module'])
-			. '/view/site.' . $param['controller']
+			. '/view/' . CLIENT
+			. '.' . $param['controller']
 			. '.' . $param['action']);
 		return $this->dispatcher->forward([
 			'namespace'     => 'Modules\\' . ucfirst($param['controller']),
 			'controller' => $param['controller'],
-			'action' => $param['action'],
-			'params' => $param['params'],
+			'action' => ($param['action'] ?? 'index'),
+			'params' => ($param['params'] ?? []),
 		]);
 	}
 }

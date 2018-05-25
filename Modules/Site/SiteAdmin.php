@@ -1,37 +1,43 @@
 <?php
 namespace Modules\Site;
-use Phalcon\Paginator\Adapter\QueryBuilder as PaginatorQueryBuilder;
-class SiteAdmin extends \Library\AdminController{
-	public function indexAction(){
-		if($this->request->isAjax()){
-			$limit = $this->request->getPost('length', 'int');
-			$page = $limit ? ($this->request->getPost('start', 'int') + $limit)/$limit : 1;
 
-			$builder = $this->modelsManager->createBuilder()->addFrom('Modules\Users\Model\Users');
-			$paginator = (new PaginatorQueryBuilder([
-					'builder' => $builder,
-					'limit' => $limit,
-					'page'  => $page,
-				]))->getPaginate();
-			$data = [
-					'data' => [],
-					'draw' => $this->request->getPost('draw', 'int'),
-					'recordsTotal' => $paginator->total_items,
-					'recordsFiltered' => $paginator->total_items
-				];
-			$i = 0;
-			foreach ($paginator->items as $item) {
-				$data['data'][$i][] = $item->id;
-				$data['data'][$i][] = $item->name;
-				$data['data'][$i][] = '<a href="/black/delete/' . $item->id . '"'
-					. 'title="Удалить" onclick="return confirm(\'Вы уверены?\');" class="btn btn-default">'
-					. '<i class="fa fa-trash"></i></a>';
-				$i++;
-			}
-			$this->response->setContentType('application/json', 'UTF-8');
-			$this->response->setJsonContent($data);
-		}else{
-			$this->tag->setTitle('Черный список');
-		}
-	}
+use Modules\Site\Model\Site;
+
+class PhoneController extends \Library\AdminController{
+	public $table = 'Modules\Site\Model\Site';
+	public $variables = [
+		'' => [
+			'phone' => [
+				'name' => 'Номер телефона',
+				'type' => 'text',
+			],
+			'status' => [
+				'name' => 'Статус',
+				'type' => 'select',
+				'options' => [
+					ContactEmail::STATUS_NOT_CONFIRMED => 'Не подтвежден',
+					ContactEmail::STATUS_BLOCKED => 'Заблокирован',
+					ContactEmail::STATUS_ACTIVE => 'Активен',
+				]
+			]
+		]
+	];
+
+	public $list = [
+		'phone' => [
+			'name' => 'Номер телефона',
+			'sql' => true
+		],
+
+		'status' => [
+			'name' => 'Статус',
+			'type' => 'select',
+			'options' => [
+				ContactEmail::STATUS_NOT_CONFIRMED => 'Не подтвежден',
+				ContactEmail::STATUS_BLOCKED => 'Заблокирован',
+				ContactEmail::STATUS_ACTIVE => 'Активен',
+			],
+			'sql' => true
+		],
+	];
 }

@@ -11,17 +11,6 @@
 	{{ assets.outputCss() }}
 </head>
 <body>
-	<div class="container-fluid h-100">
-		<div class="row h-100">
-			{{ partial('menu') }}
-			<main class="col bg-faded py-3">
-				{{ flash.output() }}
-				{{ content() }}
-			</main>
-		</div>
-	</div>
-	{{ assets.outputJs('footer_admin') }}
-	{% do assets.addJs('js/list.js') %}
-	{{ assets.outputJs() }}
+	{{ content() }}	
 </body>
 </html>

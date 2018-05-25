@@ -8,7 +8,6 @@ return [
 			BASE_PATH . '/public/css/admin.css',
 			BASE_PATH . '/public/css/bootstrap.css',
 			BASE_PATH . '/public/css/fa-svg-with-js.css',
-			BASE_PATH . '/public/css/jquery.dataTables.css',
 		],
 	],
 	'footer_admin' => [
@@ -19,7 +18,6 @@ return [
 			BASE_PATH . '/public/js/jquery.min.js',
 			BASE_PATH . '/public/js/bootstrap.js',
 			BASE_PATH . '/public/js/fontawesome-all.js',
-			BASE_PATH . '/public/js/jquery.dataTables.min.js',
 		],
 	],
 ];

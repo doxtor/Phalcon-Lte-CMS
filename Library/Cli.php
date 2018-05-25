@@ -1,12 +1,10 @@
 <?php
 namespace Library;
 class Cli extends \Library\Bootstrap{
-	public function _run($argv)
-	{
+	public function _run($argv){
 		$this->di = new \Phalcon\Di\FactoryDefault\Cli();
 		$this->initLoader();
 		$this->initConfig();
-		$this->initFolders();
 		$this->initCache();
 		$this->initDB();
 		$console = new \Phalcon\Cli\Console();
@@ -27,11 +25,5 @@ class Cli extends \Library\Bootstrap{
 		} catch (\Phalcon\Exception $e) {
 			echo $e->getMessage();
 		}
-	}
-	protected function initFolders(){
-		define('VIEWS_PATH', BASE_PATH . '/Views/site/');
-		define('CACHE_PATH', BASE_PATH . '/cache/');
-		define('ASSETS_PATH', BASE_PATH . '/public/assets/');
-		define('ASSETS_URL', 'assets/');
 	}
 }

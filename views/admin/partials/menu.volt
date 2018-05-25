@@ -3,13 +3,10 @@
 		<div class="collapse navbar-collapse">
 			<ul class="flex-md-column flex-row navbar-nav w-100 justify-content-between">
 				<li class="nav-item">
-					<a class="nav-link pl-0 text-nowrap" href="#"><i class="fa fa-bullseye fa-fw"></i> <span class="font-weight-bold">Brand</span></a>
+					<a class="nav-link pl-0 text-nowrap" href="/{{ config.admin.url }}/"><i class="fa fa-bullseye fa-fw"></i> <span class="font-weight-bold">Phalcon-Lte-CMS</span></a>
 				</li>
 				<li class="nav-item">
-					<a class="nav-link pl-0" href="#"><i class="fa fa-heart-o fa-fw"></i> <span class="d-none d-md-inline">Link</span></a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link pl-0" href="#"><i class="fa fa-book fa-fw"></i> <span class="d-none d-md-inline">Link</span></a>
+					<a class="nav-link pl-0" href="#"><i class="fa fa-book fa-fw"></i> <span class="d-none d-md-inline">Content</span></a>
 				</li>
 				<li class="nav-item">
 					<a class="nav-link pl-0" href="#"><i class="fa fa-heart fa-fw"></i> <span class="d-none d-md-inline">Link</span></a>

@@ -4,7 +4,6 @@ class Admin extends Bootstrap{
 	public $di = null;
 	public function run(){
 		$this->di = new \Phalcon\Di\FactoryDefault();
-		$this->initFolders();
 		$this->initLoader();
 		$this->initConfig();
 		$this->initCache();
@@ -24,12 +23,6 @@ class Admin extends Bootstrap{
 		$response = $this->dispatch();
 		$response->send();
 	}
-	protected function initFolders(){
-		define('VIEWS_PATH', BASE_PATH . '/views/admin');
-		define('CACHE_PATH', BASE_PATH . '/cache/');
-		define('ASSETS_PATH', BASE_PATH . '/public/assets/');
-		define('ASSETS_URL', 'assets/');
-	}
 	protected function dispatch(){
 		$router = $this->di->get('router');
 		$router->handle();
@@ -45,7 +38,7 @@ class Admin extends Bootstrap{
 		$dispatcher->setDefaultNamespace('Modules\\' . $module);
 		$view->setViewsDir(MODULES_PATH . $module);
 		$view->pick(MODULES_PATH
-			. ucfirst($router->getControllerName())
+			. $module
 			. '/view/admin.'
 			. $router->getModuleName()
 			. '.' . $router->getActionName());

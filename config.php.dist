@@ -1,6 +1,9 @@
 <?php
 use Phalcon\Config;
 return new Config([
+	'admin' => [
+		'url' => 'admin',
+	],
 	'debug' => [
 		'enable'          => true,
 		'display_errors'  => -1,
