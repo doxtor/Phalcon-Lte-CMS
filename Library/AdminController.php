@@ -1,12 +1,17 @@
 <?php
 namespace Library;
 
+use Phalcon\Paginator\Adapter\QueryBuilder as PaginatorQueryBuilder;
+use Phalcon\Tag;
+use Library\Paginator;
 class AdminController extends Controller{
+	public $title = 'Title';
 	public $table;
 	public $form;
 	public $variables;
 	public $list;
 	public $builder;
+	public $limit = 10;
 	public function beforeExecuteRoute($dispatcher){
 		if(!$this->session->get('role') && !(
 			$dispatcher->getModuleName() === 'users' &&
@@ -21,82 +26,37 @@ class AdminController extends Controller{
 			]);
 		}
 	}
+	public function indexAction(){}
 	public function listAction(){
-		parent::_list();
-		parent::setTitle($this->getModuleTitle());
-		$modelClass = $this->table;
-		$primaryKeyName = $modelClass::PRIMARY_KEY;
-
 		$columns = [];
 		foreach ($this->list as $key => $value) {
 			if(isset($value['sql']) && $value['sql']){
 				$columns[] = $key;
 			}
 		}
-
-		$module = $this->router->getModuleName();
-		$this->limit = $this->request->getQuery('limit', 'string',$this->limit);
-		$qb = $this->modelsManager->createBuilder()
-			->columns($columns)
-			->addFrom($this->table);
-
-
-
-		if (isset($this->list['actions']) && isset($this->list['actions']['sortable'])) {
-			$orderColumnName = $this->list['actions']['orderColumnName'];
-			$columns[] = $orderColumnName;
-			$qb->columns($columns);
-			$qb->orderBy($orderColumnName);
-
-			$this->view->is_sortable = true;
-			$this->view->order_column_name = $orderColumnName;
-			$this->view->sort_link = $this->url->get([
-				'for' => 'default',
-				'module' => $module,
-				'controller' => $this->router->getControllerName(),
-				'action' => 'sort'
-			]);
-		} else {
-			$this->view->is_sortable = false;
-		}
-
+		$builder = $this->modelsManager->createBuilder()
+					->columns($columns)
+					->from($this->table);
+		$this->view->paginator = (new PaginatorQueryBuilder([
+				'builder' => $builder,
+				'limit'   => 20,
+				'page'    => 1,
+			]))->getPaginate();
+		$this->view->setLayout('list');
+		$model = $this->table;
+		$this->view->primary_key_name = $model::PRIMARY_KEY;
 		$this->view->list = $this->list;
-		$paginator = new \MyPaginator(
-			[
-				"builder" => $qb,
-				"limit"   => $this->limit,
-				"page"    => $this->request->getQuery('page','int',1),
-				//"total"		=> 100,
-			]
-		);
-
-		$this->view->pagination = $paginator->getPaginate();
-		$this->view->limit = $this->limit;
 		$this->view->edit_link = $this->url->get([
 			'for' => 'default',
 			'module' => $module,
 			'controller' => $this->router->getControllerName(),
 			'action' => 'edit'
 		]);
-
-		$this->view->primary_key_name = $primaryKeyName;
-
-		if (file_exists(APP.'/modules/'.$module.'/forms/Config.php')){
-			$this->view->config_link = $this->url->get([
-				'for' => 'default',
-				'module' => 'config',
-				'controller' => 'config',
-				'action' => 'edit',
-				'params' => $module
-			]);
-		}else{
-			$this->view->config_link = false;
-		}
-		$this->view->setLayout('list');
+		Tag::setTitle($this->title);
 	}
 	public function editAction($primaryKeyValue = null){
-		$modelClass = $this->table;
-		$primaryKeyName = $modelClass::PRIMARY_KEY;
+		$model = $this->table;
+		$primaryKeyName = $model::PRIMARY_KEY;
 		$primaryKeyValue = $this->filter->sanitize($primaryKeyValue, 'int');
 
 		parent::_edit();

@@ -3,7 +3,8 @@ namespace Modules\Site;
 
 use Modules\Site\Model\Site;
 
-class PhoneController extends \Library\AdminController{
+class SiteAdmin extends \Library\AdminController{
+	public $title = 'Site pages';
 	public $table = 'Modules\Site\Model\Site';
 	public $variables = [
 		'' => [
@@ -14,30 +15,23 @@ class PhoneController extends \Library\AdminController{
 			'status' => [
 				'name' => 'Статус',
 				'type' => 'select',
-				'options' => [
-					ContactEmail::STATUS_NOT_CONFIRMED => 'Не подтвежден',
-					ContactEmail::STATUS_BLOCKED => 'Заблокирован',
-					ContactEmail::STATUS_ACTIVE => 'Активен',
-				]
+				'options' => []
 			]
 		]
 	];
 
 	public $list = [
-		'phone' => [
-			'name' => 'Номер телефона',
-			'sql' => true
+		'id' => [
+			'name' => 'ID',
+			'sql' => true,
 		],
-
-		'status' => [
-			'name' => 'Статус',
-			'type' => 'select',
-			'options' => [
-				ContactEmail::STATUS_NOT_CONFIRMED => 'Не подтвежден',
-				ContactEmail::STATUS_BLOCKED => 'Заблокирован',
-				ContactEmail::STATUS_ACTIVE => 'Активен',
-			],
-			'sql' => true
+		'name' => [
+			'name' => 'Название',
+			'sql' => true,
+		],
+		'actions' => [
+			'sortable' => true,
+			'orderColumnName' => 'sort',
 		],
 	];
 }

@@ -15,7 +15,6 @@ $config = include BASE_PATH . '/config.php';
 try {
 	$find = '/^\/' . $config->get('admin')->get('url') . '(\/|$)/';
 	if (isset($_GET['_url']) && preg_match($find, $_GET['_url'])){
-
 		$_GET['_url'] =  '/'. preg_replace($find, '', $_GET['_url']);
 		define('CLIENT', 'admin');
 		define('VIEWS_PATH', BASE_PATH . '/views/'.CLIENT);

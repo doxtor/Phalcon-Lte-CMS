@@ -7,12 +7,12 @@
 	</div>
 	<div class="box-body">
 		{% for name, item in items %}
-		  <div class="row form-group">
-			<label for="input{{ name }}" class="col-sm-2 control-label">{{ item['name'] }}</label>
-			<div class="col-sm-10">
-			{{ form.render(name) }}
+			<div class="row form-group">
+				<label for="input{{ name }}" class="col-sm-2 control-label">{{ item['name'] }}</label>
+				<div class="col-sm-10">
+				{{ form.render(name) }}
+				</div>
 			</div>
-		  </div>
 		{% endfor  %}
 	</div>
 	</div>

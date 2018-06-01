@@ -10,7 +10,7 @@ class Admin extends Bootstrap{
 		$this->initRouter([
 			'module' => 'site',
 			'controller' => 'site',
-			'action' => 'index',
+			'action' => 'list',
 		]);
 		$this->initResponse();
 		$this->initRequest();

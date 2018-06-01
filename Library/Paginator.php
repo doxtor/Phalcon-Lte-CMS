@@ -18,15 +18,12 @@ class Paginator implements PaginatorInterface{
 	 * @throws \Phalcon\Exception
 	 */
 	public function __construct($config) {
-
 		if (!isset($config['builder'])) {
 			throw new \Phalcon\Exception('builder required parameter.');
 		}
-
 		if (!isset($config['limit'])) {
 			throw new \Phalcon\Exception('limit required parameter.');
 		}
-
 
 		$this->builder = $config['builder'];
 		$this->limit = (int) $config['limit'];
@@ -134,7 +131,7 @@ class Paginator implements PaginatorInterface{
 	 */
 	public function getPaginate() {
 		$this->setPagesCount();
-		$page = new stdClass();
+		$page = new \stdClass();
 		$page->current = $this->currentPage;
 		$page->before = $this->getBeforePage();
 		$page->next = $this->getNextPage();

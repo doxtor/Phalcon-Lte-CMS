@@ -10,7 +10,7 @@
 	{{ assets.outputCss('header_admin') }}
 	{{ assets.outputCss() }}
 </head>
-<body>
-	{{ content() }}	
+<body class="fixed-nav sticky-footer bg-dark" id="page-top">
+	{{ content() }}
 </body>
 </html>

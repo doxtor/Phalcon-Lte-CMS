@@ -18,4 +18,7 @@ class Controller extends \Phalcon\Mvc\Controller{
 			'params' => ($param['params'] ?? []),
 		]);
 	}
+	public function _list(){
+		
+	}
 }
