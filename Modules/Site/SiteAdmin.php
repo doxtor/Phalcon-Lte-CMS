@@ -8,30 +8,37 @@ class SiteAdmin extends \Library\AdminController{
 	public $table = 'Modules\Site\Model\Site';
 	public $variables = [
 		'' => [
-			'phone' => [
-				'name' => 'Номер телефона',
+			'name' => [
+				'name' => 'Name',
 				'type' => 'text',
 			],
-			'status' => [
-				'name' => 'Статус',
-				'type' => 'select',
-				'options' => []
-			]
+			'rewrite' => [
+				'name' => 'Rewrite',
+				'type' => 'text',
+			],
+			'text' => [
+				'name' => 'Text',
+				'type' => 'textarea',
+			],
 		]
 	];
-
-	public $list = [
+	public $columns = [
 		'id' => [
 			'name' => 'ID',
 			'sql' => true,
 		],
 		'name' => [
-			'name' => 'Название',
+			'name' => 'Name',
+			'sql' => true,
+		],
+		'rewrite' => [
+			'name' => 'Rewrite',
 			'sql' => true,
 		],
 		'actions' => [
-			'sortable' => true,
-			'orderColumnName' => 'sort',
+			'name' => 'Actions',
+			'edit' => true,
+			'delete' => true,
 		],
 	];
 }

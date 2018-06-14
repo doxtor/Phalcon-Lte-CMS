@@ -24,7 +24,6 @@ return [
 			BASE_PATH . '/public/datatables/dataTables.bootstrap4.js',
 			BASE_PATH . '/public/js/sb-admin.js',
 			BASE_PATH . '/public/js/sb-admin-datatables.js',
-
 		],
 	],
 ];

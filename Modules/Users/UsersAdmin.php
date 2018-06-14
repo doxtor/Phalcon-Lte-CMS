@@ -20,7 +20,7 @@ class UsersAdmin extends \Library\AdminController{
 		]
 	];
 
-	public $list = [
+	public $columns = [
 		'id' => [
 			'name' => 'ID',
 			'sql' => true,
@@ -30,7 +30,7 @@ class UsersAdmin extends \Library\AdminController{
 			'sql' => true,
 		],
 		'email' => [
-			'name' => 'email',
+			'name' => 'Email',
 			'sql' => true,
 		],
 		'actions' => [

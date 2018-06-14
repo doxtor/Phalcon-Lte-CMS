@@ -3,13 +3,15 @@ namespace Library;
 
 use Phalcon\Paginator\Adapter\QueryBuilder as PaginatorQueryBuilder;
 use Phalcon\Tag;
-use Library\Paginator;
+use Library\{Paginator, AdminForm};
 class AdminController extends Controller{
 	public $title = 'Title';
+	public $module = 'core';
+	public $controller = 'index';
 	public $table;
 	public $form;
 	public $variables;
-	public $list;
+	public $columns = [];
 	public $builder;
 	public $limit = 10;
 	public function beforeExecuteRoute($dispatcher){
@@ -25,42 +27,80 @@ class AdminController extends Controller{
 				'params' => [],
 			]);
 		}
+		$this->module = $dispatcher->getModuleName();
+		$this->controller = $dispatcher->getControllerName();
 	}
 	public function indexAction(){}
 	public function listAction(){
 		$columns = [];
-		foreach ($this->list as $key => $value) {
+		foreach ($this->columns as $key => $value) {
 			if(isset($value['sql']) && $value['sql']){
 				$columns[] = $key;
 			}
 		}
-		$builder = $this->modelsManager->createBuilder()
-					->columns($columns)
-					->from($this->table);
-		$this->view->paginator = (new PaginatorQueryBuilder([
-				'builder' => $builder,
-				'limit'   => 20,
-				'page'    => 1,
-			]))->getPaginate();
-		$this->view->setLayout('list');
 		$model = $this->table;
-		$this->view->primary_key_name = $model::PRIMARY_KEY;
-		$this->view->list = $this->list;
-		$this->view->edit_link = $this->url->get([
-			'for' => 'default',
-			'module' => $module,
-			'controller' => $this->router->getControllerName(),
-			'action' => 'edit'
-		]);
-		Tag::setTitle($this->title);
-	}
-	public function editAction($primaryKeyValue = null){
-		$model = $this->table;
-		$primaryKeyName = $model::PRIMARY_KEY;
-		$primaryKeyValue = $this->filter->sanitize($primaryKeyValue, 'int');
+		if($this->request->isAjax()){
+			$start = $this->request->getPost('start', 'int', 0);
+			$length = $this->request->getPost('length', 'int', 10);
+			$builder = $this->modelsManager->createBuilder()
+				->columns($columns)
+				->from($this->table);
 
-		parent::_edit();
-		parent::setTitle($this->getModuleTitle());
+			/*if($search_type_log = $this->request->getQuery('search_type_log')){
+				$builder->andWhere('l.type IN('.$search_type_log.')');
+			}
+			$search = $this->request->getPost('search');
+			$search = $search['value'];
+			if($search){
+				$builder->andWhere('l.content LIKE "%'.$search.'%"');
+			}*/
+			$order = $this->request->getPost('order')[0];
+			if(isset($order['column']) && isset($columns[$order['column']]))
+				$builder->orderBy($columns[$order['column']] . ' ' . $order['dir']);
+
+			$page = (new PaginatorQueryBuilder([
+					'builder' => $builder,
+					'limit' => $length,
+					'page'  => ($length ? ($start + $length)/$length : 1),
+				]))->getPaginate();
+			$data = [
+					'draw' => $this->request->getPost('draw', 'int', 1),
+					'recordsTotal' => $page->total_items,
+					'recordsFiltered' => $page->total_items
+				];
+			$i = 0; $data['data'] = [];
+			foreach ($page->items as $item) {
+				foreach ($this->columns as $key => $value) {
+					if(isset($value['sql'])){
+						$data['data'][$i][] = $item->$key ?? '';
+					}
+					if($key == 'actions'){
+						$action = '';
+						if(isset($value['edit']))
+							$action .= '<a href="'
+							. $this->url(['action' => 'edit', 'id' => $item->id])
+							. $item->id . '"><i class="fas fa-edit"></i></a>';
+						if(isset($value['delete']))
+							$action .= '<a href="'
+							. $this->url(['action' => 'delete', 'id' => $item->id])
+							. $item->id . '"><i class="fas fa-trash-alt"></i></a>';
+						$data['data'][$i][] = $action;
+					}
+				}
+				$i++;
+			}
+			$this->response->setContentType('application/json', 'UTF-8');
+			$this->response->setJsonContent($data);
+		}else{
+			$this->view->columns = $this->columns;
+			Tag::setTitle($this->title);
+			$this->view->setLayout('list');
+		}
+	}
+	public function editAction($id = null){
+		Tag::setTitle($this->title);
+		$model = $this->table;
+		$id = $this->filter->sanitize($id, 'int');
 
 		$columns = [];
 		foreach ($this->variables as $key => $value) {
@@ -68,30 +108,20 @@ class AdminController extends Controller{
 				$columns[] = $col;
 			}
 		}
-
 		$value = null;
-
-		if (isset($primaryKeyValue)) {
-			$value = $this->modelsManager
-				->createBuilder()
-				->columns($columns)
-				->addFrom($this->table)
-				->where( $primaryKeyName . ' = :' . $primaryKeyName . ':', [$primaryKeyName => $primaryKeyValue])
-				->getQuery()
-				->execute()
-				->getFirst();
+		if (isset($id)) {
+			$value = $model::findFirst([
+				'columns' => $columns,
+				'conditions' => 'id = ?0',
+				'bind' => [$id]
+			]);
 		}
-
-		$this->renderForm($value, $primaryKeyValue);
+		$this->renderForm($value, $id);
 	}
-	public function saveAction($primaryKeyValue = null) {
-		$columns = [];
-		$values = [];
-		$modelClass = $this->table;
-		$primaryKeyName = $modelClass::PRIMARY_KEY;
-		$primaryKeyValue = $this->filter->sanitize($primaryKeyValue, 'int');
-
+	public function saveAction($id = null) {
+		$id = $this->filter->sanitize($id, 'int');
 		if ($this->request->isPost()) {
+			$columns = [];$values = [];
 			foreach ($this->variables as $key => $value) {
 				foreach ($value as $col => $val) {
 					$columns[] = $col;
@@ -99,94 +129,66 @@ class AdminController extends Controller{
 					$values[$col] = $value ? $value : '0';
 				}
 			}
-
-			$modelClass = $this->table;
-			if (empty($primaryKeyValue)){
-				$model = new $modelClass();
-				$model->assign($values, null, $columns);
-				if ($model->create() === false) {
-					$this->publishErrorMessages($model);
-					$this->renderForm($model);
+			$model = $this->table;
+			if (!isset($id)){
+				$model = new $model();
+				$item->assign($values, null, $columns);
+				if ($item->create() === false) {
+					$this->publishErrorMessages($item);
+					$this->renderForm($item);
 					return false;
 				}
 			} else {
-				$model = $modelClass::findFirstByFields([$primaryKeyName => $primaryKeyValue]);
-				$model->assign($values, null, $columns);
-				if ($model->update() === false) {
-					$this->publishErrorMessages($model);
-					$this->renderForm($model, $primaryKeyValue);
+				$item = $model::findFirst([
+					'conditions' => 'id = ?0',
+					'bind' => [$id]
+				]);
+				try{
+					if($item->save($values) === false){
+						echo 'da';
+						exit();
+					}
+				} catch(\Exception $e){
+					echo $e->getMessage();
+					exit();
+				}
+				$item->name = $values['name'];
+				if($item->save() === false){
+					echo 'error';
+				}else{
+					echo 'ok';
+				}
+				exit();
+
+				if ($item->save($values) === false) {
+					$this->publishErrorMessages($item);
+					$this->renderForm($item, $id);
 					return false;
 				}
 			}
-
-			$this->response->redirect($this->url->get([
-				'for' => 'default',
-				'module' => $this->router->getModuleName(),
-				'controller' => $this->router->getControllerName(),
-				'action' => 'list'
-			]));
-
-		}
-		return true;
-	}
-	public function sortAction() {
-		$this->view->disable();
-		$modelClass = $this->table;
-		$primaryKeyName = $modelClass::PRIMARY_KEY;
-		$ids = $this->request->getPost('ids');
-		$orderColumnName = $this->list['actions']['orderColumnName'];
-		$idArgs = implode(', ',  array_map(function($value) { return '?' . $value; }, array_keys($ids)));
-
-		$items = $this->modelsManager
-			->createBuilder()
-			->columns([$primaryKeyName, $orderColumnName])
-			->addFrom($this->table)
-			->where($primaryKeyName . ' IN (' . $idArgs . ')', $ids)
-			->orderBy($orderColumnName)
-			->getQuery()
-			->execute();
-
-		if (count($items)) {
-			$minOrder = $items->getFirst()->$orderColumnName;
-
-			foreach ($items as $item) {
-				$id = $item->$primaryKeyName;
-				$newPosition = array_search($id, $ids) + $minOrder;
-
-				if ($item->$orderColumnName != $newPosition) {
-					$this->db->update(
-						$modelClass::getSource(),
-						[$orderColumnName],
-						[$newPosition],
-						$primaryKeyName . ' = ' . $id
-					);
-				}
-
-			}
+			$this->response->redirect($this->url(['action' => 'list']));
 		}
 	}
-	private function renderForm($entity = null, $primaryKeyValue = null) {
-		if (isset($primaryKeyValue)) {
-			$this->view->save_link = $this->url->get([
-				'for' => 'default',
-				'module' => $this->router->getModuleName(),
-				'controller' => $this->router->getControllerName(),
-				'action' => 'save',
-				'params' => $primaryKeyValue
-			]);
-		} else {
-			$this->view->save_link = $this->url->get([
-				'for' => 'default',
-				'module' => $this->router->getModuleName(),
-				'controller' => $this->router->getControllerName(),
-				'action' => 'save'
-			]);
+	private function renderForm($value = null, $id = null) {
+		if(isset($id)){
+			$params = ['action' => 'save', 'params' => $id];
+		}else{
+			$params = ['action' => 'save'];
 		}
-
-		$this->view->form = new \AdminForm();
-		$this->view->form->initialize($this->variables, $entity);
+		$this->view->save_link = $this->url($params);
+		$this->view->form = new AdminForm();
+		$this->view->form->initialize($this->variables, $value);
 		$this->view->variables = $this->variables;
 		$this->view->setLayout('edit');
+	}
+	public function url($params = []){
+		return '/admin' . $this->url->get(
+			array_merge([
+			'for' => 'default',
+			'module' => $this->module,
+			'controller' => $this->controller],
+			$params)
+		);
 	}
 	public function redirect($location = null, $externalRedirect = false, $statusCode = 302){
 		if(!isset($location)){
@@ -195,5 +197,10 @@ class AdminController extends Controller{
 			$location = $this->config->get('admin')->get('url') . '/' . $location;
 		}
 		$this->response->redirect($location, $externalRedirect, $statusCode);
+	}
+	public function publishErrorMessages($entity) {
+		foreach ($entity->getMessages() as $message) {
+			$this->flash->error($message);
+		}
 	}
 }
