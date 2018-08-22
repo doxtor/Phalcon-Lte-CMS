@@ -132,10 +132,10 @@ class AdminController extends Controller{
 			$model = $this->table;
 			if (!isset($id)){
 				$model = new $model();
-				$item->assign($values, null, $columns);
-				if ($item->create() === false) {
-					$this->publishErrorMessages($item);
-					$this->renderForm($item);
+                $model->assign($values, null, $columns);
+				if ($model->create() === false) {
+					$this->publishErrorMessages($model);
+					$this->renderForm($model);
 					return false;
 				}
 			} else {
@@ -144,21 +144,10 @@ class AdminController extends Controller{
 					'bind' => [$id]
 				]);
 				try{
-					if($item->save($values) === false){
-						echo 'da';
-						exit();
-					}
+					$item->save($values);
 				} catch(\Exception $e){
 					echo $e->getMessage();
-					exit();
 				}
-				$item->name = $values['name'];
-				if($item->save() === false){
-					echo 'error';
-				}else{
-					echo 'ok';
-				}
-				exit();
 
 				if ($item->save($values) === false) {
 					$this->publishErrorMessages($item);
@@ -169,6 +158,17 @@ class AdminController extends Controller{
 			$this->response->redirect($this->url(['action' => 'list']));
 		}
 	}
+	public function deleteAction($id = null){
+        $id = $this->filter->sanitize($id, 'int');
+        if (isset($id)) {
+            $model = $this->table;
+            ($model::findFirst([
+                'conditions' => 'id = ?0',
+                'bind' => [$id]
+            ]))->delete();
+        }
+        $this->response->redirect($this->url(['action' => 'list']));
+    }
 	private function renderForm($value = null, $id = null) {
 		if(isset($id)){
 			$params = ['action' => 'save', 'params' => $id];
@@ -182,7 +182,7 @@ class AdminController extends Controller{
 		$this->view->setLayout('edit');
 	}
 	public function url($params = []){
-		return '/admin' . $this->url->get(
+		return '/' . $this->config->get('admin')->get('url') . $this->url->get(
 			array_merge([
 			'for' => 'default',
 			'module' => $this->module,

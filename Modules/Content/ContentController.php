@@ -4,8 +4,8 @@ use Phalcon\Paginator\Adapter\QueryBuilder as PaginatorQueryBuilder;
 class ContentController extends \Library\Controller{
 	public function indexAction(){
 		$builder = $this->modelsManager->createBuilder()
-			->columns('c.id, c.name, c.description, DATE_FORMAT(c.created_dt, "%M %d, %Y") as created_dt,
-				u.login as user_name')
+			->columns('c.id, c.name, c.text, DATE_FORMAT(c.created_dt, "%M %d, %Y") as created_dt,
+				u.name as user_name')
 			->addFrom('Modules\Content\Model\Content', 'c')
 			->leftJoin('Modules\Users\Model\Users', 'c.user_id = u.id', 'u')
 			->orderBy('c.created_dt');
@@ -19,8 +19,8 @@ class ContentController extends \Library\Controller{
 	public function itemAction($id = null){
 		if(isset($id)){
 			$builder = $this->modelsManager->createBuilder()
-				->columns('c.id, c.name, c.description, DATE_FORMAT(c.created_dt, "%M %d, %Y") as created_dt,
-					u.login as user_name')
+				->columns('c.id, c.name, c.text, DATE_FORMAT(c.created_dt, "%M %d, %Y") as created_dt,
+					u.name as user_name')
 				->addFrom('Modules\Content\Model\Content', 'c')
 				->leftJoin('Modules\Users\Model\Users', 'c.user_id = u.id', 'u')
 				->andWhere('c.id = '.(int) $id);

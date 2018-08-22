@@ -40,6 +40,7 @@ class UsersAdmin extends \Library\AdminController{
 	];
 
 	public function loginAction(){
+
 		if($this->session->get('role') === 'admin'){
 			$this->redirect();
 		}elseif(!$this->request->isPost()){
@@ -48,15 +49,20 @@ class UsersAdmin extends \Library\AdminController{
 		}else{
 			$login = $this->request->getPost('login');
 			$password = $this->request->getPost('password');
-			$user = Users::findFirst([
-				'columns' => 'id, password, role',
-				'conditions' => 'login = :login: OR email = :login:',
-				'bind' => ['login' => $login]
-			]);
-			if($user && $user->password == md5($password . ':' . $password)){
-				$this->session->set('role', $user->role);
-				$this->session->set('id', $user->id);
-			}
+			if($user = Users::findFirst([
+				'columns' => 'id, role',
+				'conditions' => '
+				(login = :login: OR email = :login:) 
+				AND 
+				password = :password:',
+				'bind' => [
+				    'login' => $login,
+                    'password' => md5($password . ':' . $password)
+                ]
+			])){
+                $this->session->set('role', $user->role);
+                $this->session->set('id', $user->id);
+            }
 			$this->redirect();
 		}
 	}

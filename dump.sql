@@ -25,13 +25,16 @@ INSERT INTO `site` (`id`, `rewrite`, `name`, `module`, `controller`, `action`, `
 
 CREATE TABLE `users` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'идентификатор',
-  `name` varchar(60) NOT NULL DEFAULT '' COMMENT 'логин',
+  `login` varchar(60) NOT NULL DEFAULT '' COMMENT 'логин',
   `password` varchar(32) NOT NULL DEFAULT '' COMMENT 'пароль в зашифрованном виде',
-  `mail` varchar(64) NOT NULL DEFAULT '' COMMENT 'e-mail',
+  `email` varchar(64) NOT NULL DEFAULT '' COMMENT 'e-mail',
+  `role` enum('admin','user') DEFAULT 'user' NULL,
   `trash` enum('0','1') NOT NULL DEFAULT '0' COMMENT 'запись удалена в корзину: 0 - нет, 1 - да',
   PRIMARY KEY (`id`),
-  KEY `name` (`name`)
+  KEY `login` (`login`)
 ) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8 COMMENT='Пользователи';
+
+INSERT INTO cms.users (login,password,email,`role`,trash) VALUES ('admin','d2abaa37a7c3db1137d385e1d8c15fd2','admin@gmail.com','admin','0');
 
 CREATE TABLE `content` (
   `id` int(11) UNSIGNED NOT NULL COMMENT 'идентификатор',
