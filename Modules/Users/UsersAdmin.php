@@ -3,6 +3,7 @@ namespace Modules\Users;
 
 use Modules\Users\Model\Users;
 use Phalcon\Tag;
+
 class UsersAdmin extends \Library\AdminController{
 	public $title = 'Users';
 	public $table = 'Modules\Users\Model\Users';

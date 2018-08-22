@@ -20,6 +20,7 @@ try {
 		define('VIEWS_PATH', BASE_PATH . '/views/'.CLIENT);
 		$app = new \Library\Admin();
 	}elseif(php_sapi_name() === 'cli'){
+        define('CLIENT', 'cli');
 		(new \Library\Cli())->_run($argv);
 		exit;
 	}else{

@@ -11,6 +11,7 @@
 	{{ assets.outputCss() }}
 </head>
 <body class="fixed-nav sticky-footer bg-dark" id="page-top">
+	{{ dump(this.modules) }}
 	{{ content() }}
 </body>
 </html>

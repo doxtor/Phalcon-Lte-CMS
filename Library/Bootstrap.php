@@ -23,11 +23,23 @@ class Bootstrap extends Application{
 		});
 	}
 	protected function initModules(){
-		$this->di->setShared('modules',function () {
-			$modules = scandir(MODULES_PATH);
-			unset($modules[0]);
-			unset($modules[1]);
-			return $modules;
+		$this->di->setShared('modules', function(){
+            $modules = [];
+            $controller = CLIENT === 'site' ? 'Controller': CLIENT === 'admin' ? 'Admin' : '';
+            $folders = scandir(MODULES_PATH);
+            foreach ($folders as $folder){
+                if($folder !== '.'
+                    && $folder !== '..'
+                    && is_dir(MODULES_PATH . $folder)
+                    && class_exists(
+                        'Modules\\'
+                        . $folder . '\\'
+                        . $folder . $controller)
+                ){
+                    $modules[$folder] = $folder;
+                }
+            }
+		    return $modules;
 		});
 	}
 	protected function initResponse(){

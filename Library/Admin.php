@@ -1,7 +1,6 @@
 <?php
 namespace Library;
 class Admin extends Bootstrap{
-	public $di = null;
 	public function run(){
 		$this->di = new \Phalcon\Di\FactoryDefault();
 		$this->initLoader();
@@ -12,6 +11,7 @@ class Admin extends Bootstrap{
 			'controller' => 'site',
 			'action' => 'list',
 		]);
+
 		$this->initResponse();
 		$this->initRequest();
 		$this->initDB();
@@ -19,6 +19,7 @@ class Admin extends Bootstrap{
 		$this->initDispatcher();
 		$this->initFlash();
 		$this->initView();
+        $this->initModules();
 		$this->initAssets();
 		$response = $this->dispatch();
 		$response->send();

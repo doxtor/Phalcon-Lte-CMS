@@ -1,7 +1,6 @@
 <?php
 namespace Library;
 class Site extends Bootstrap{
-	public $di = null;
 	public function run(){
 		$this->di = new \Phalcon\Di\FactoryDefault();
 		$this->initLoader();
